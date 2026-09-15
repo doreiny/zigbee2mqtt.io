@@ -18,8 +18,9 @@ pageClass: device-page
 | Model | WLS-15ZBS  |
 | Vendor  | [Climax](/supported-devices/#v=Climax)  |
 | Description | Water leakage sensor |
-| Exposes | water_leak, battery_low, tamper, battery, linkquality |
+| Exposes | water_leak, battery_low, tamper, battery |
 | Picture | ![Climax WLS-15ZBS](https://www.zigbee2mqtt.io/images/devices/WLS-15ZBS.png) |
+
 
 
 <!-- Notes BEGIN: You can edit here. Add "## Notes" headline if not already present. -->
@@ -56,11 +57,4 @@ Value can be found in the published state on the `battery` property.
 It's not possible to read (`/get`) or write (`/set`) this value.
 The minimal value is `0` and the maximum value is `100`.
 The unit of this value is `%`.
-
-### Linkquality (numeric)
-Link quality (signal strength).
-Value can be found in the published state on the `linkquality` property.
-It's not possible to read (`/get`) or write (`/set`) this value.
-The minimal value is `0` and the maximum value is `255`.
-The unit of this value is `lqi`.
 

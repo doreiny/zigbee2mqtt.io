@@ -1,6 +1,6 @@
 ---
-title: "Neo NAS-AB02B2 control via MQTT"
-description: "Integrate your Neo NAS-AB02B2 via Zigbee2MQTT with whatever smart home infrastructure you are using without the vendor's bridge or gateway."
+title: "NEO NAS-AB02B2 control via MQTT"
+description: "Integrate your NEO NAS-AB02B2 via Zigbee2MQTT with whatever smart home infrastructure you are using without the vendor's bridge or gateway."
 addedAt: 2022-01-31T17:42:44
 pageClass: device-page
 ---
@@ -11,23 +11,29 @@ pageClass: device-page
 <!-- Do not use h1 or h2 heading within "## Notes"-Section. -->
 <!-- !!!! -->
 
-# Neo NAS-AB02B2
+# NEO NAS-AB02B2
 
 |     |     |
 |-----|-----|
 | Model | NAS-AB02B2  |
-| Vendor  | [Neo](/supported-devices/#v=Neo)  |
+| Vendor  | [NEO](/supported-devices/#v=NEO)  |
 | Description | Alarm |
-| Exposes | battery_low, alarm, melody, duration, volume, battpercentage, linkquality |
-| Picture | ![Neo NAS-AB02B2](https://www.zigbee2mqtt.io/images/devices/NAS-AB02B2.png) |
+| Exposes | battery_low, alarm, melody, duration, volume, battpercentage |
+| Picture | ![NEO NAS-AB02B2](https://www.zigbee2mqtt.io/images/devices/NAS-AB02B2.png) |
+
 
 
 <!-- Notes BEGIN: You can edit here. Add "## Notes" headline if not already present. -->
-
-
+## Notes
+Alarm melodies sounds/tunes: 1 - fuer elise 2 - big ben 3 - ring ring 4 - lone ranger 5 - turkish march 6 - high pitch siren 7 - red alert 8 - cricket 9 - beep beep 10 - dogs 11 - police 12 - chime 13 - phone ring 14 - firetruck 15 - clock chime 16 - alarm clock 17 - psycho 18 - doorbell
 <!-- Notes END: Do not edit below this line -->
 
 
+
+## Options
+*[How to use device type specific configuration](../guide/configuration/devices-groups.md#specific-device-options)*
+
+* `time_start`: Reply to Tuya-specific time synchronization requests: "1970" - Reply with seconds since 1970/01/01 (recommended, should stop the device from asking), "2000" - Reply with seconds since 2000/01/01 (use if the weekday is wrong with 1970), "off" - Don't reply (use if replying causes too much traffic). Default for this device: "off". The value must be one of `1970`, `2000`, `off`
 
 
 ## Exposes
@@ -67,11 +73,4 @@ The possible values are: `low`, `medium`, `high`.
 Value can be found in the published state on the `battpercentage` property.
 It's not possible to read (`/get`) or write (`/set`) this value.
 The unit of this value is `%`.
-
-### Linkquality (numeric)
-Link quality (signal strength).
-Value can be found in the published state on the `linkquality` property.
-It's not possible to read (`/get`) or write (`/set`) this value.
-The minimal value is `0` and the maximum value is `255`.
-The unit of this value is `lqi`.
 

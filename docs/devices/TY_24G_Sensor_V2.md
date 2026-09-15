@@ -18,8 +18,9 @@ pageClass: device-page
 | Model | TY_24G_Sensor_V2  |
 | Vendor  | [iHseno](/supported-devices/#v=iHseno)  |
 | Description | Human presence sensor 24G |
-| Exposes | illuminance_lux, presence, target_distance, radar_sensitivity, minimum_range, maximum_range, detection_delay, fading_time, linkquality |
+| Exposes | illuminance, presence, target_distance, radar_sensitivity, minimum_range, maximum_range, detection_delay, fading_time |
 | Picture | ![iHseno TY_24G_Sensor_V2](https://www.zigbee2mqtt.io/images/devices/TY_24G_Sensor_V2.png) |
+
 
 
 <!-- Notes BEGIN: You can edit here. Add "## Notes" headline if not already present. -->
@@ -32,14 +33,16 @@ pageClass: device-page
 ## Options
 *[How to use device type specific configuration](../guide/configuration/devices-groups.md#specific-device-options)*
 
-* `illuminance_lux_calibration`: Calibrates the illuminance_lux value (percentual offset), takes into effect on next report of device. The value must be a number.
+* `time_start`: Reply to Tuya-specific time synchronization requests: "1970" - Reply with seconds since 1970/01/01 (recommended, should stop the device from asking), "2000" - Reply with seconds since 2000/01/01 (use if the weekday is wrong with 1970), "off" - Don't reply (use if replying causes too much traffic). Default for this device: "off". The value must be one of `1970`, `2000`, `off`
+
+* `illuminance_calibration`: Calibrates the illuminance value (percentual offset), takes into effect on next report of device. The value must be a number.
 
 
 ## Exposes
 
-### Illuminance (lux) (numeric)
-Measured illuminance in lux.
-Value can be found in the published state on the `illuminance_lux` property.
+### Illuminance (numeric)
+Measured illuminance.
+Value can be found in the published state on the `illuminance` property.
 It's not possible to read (`/get`) or write (`/set`) this value.
 The unit of this value is `lx`.
 
@@ -93,11 +96,4 @@ It's not possible to read (`/get`) this value.
 To write (`/set`) a value publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/set` with payload `{"fading_time": NEW_VALUE}`.
 The minimal value is `0.5` and the maximum value is `1500`.
 The unit of this value is `s`.
-
-### Linkquality (numeric)
-Link quality (signal strength).
-Value can be found in the published state on the `linkquality` property.
-It's not possible to read (`/get`) or write (`/set`) this value.
-The minimal value is `0` and the maximum value is `255`.
-The unit of this value is `lqi`.
 

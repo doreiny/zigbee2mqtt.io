@@ -18,13 +18,23 @@ pageClass: device-page
 | Model | ZG-101ZL  |
 | Vendor  | [Loginovo](/supported-devices/#v=Loginovo)  |
 | Description | Smart button |
-| Exposes | action, battery, operation_mode, linkquality |
+| Exposes | battery, operation_mode, action |
 | Picture | ![Loginovo ZG-101ZL](https://www.zigbee2mqtt.io/images/devices/ZG-101ZL.png) |
 
 
+
 <!-- Notes BEGIN: You can edit here. Add "## Notes" headline if not already present. -->
+## Operation mode
+You can switch between the "command" and "event" operation mode with a triple click
 
+Command mode enables on/off mode :
+single click : on
+double click : off
+long press (>5s) and release : brightness_move_to_level
 
+You can then use OnOff and LevelCtrl binding in this mode
+
+Event mode enables click : single/double/hold
 <!-- Notes END: Do not edit below this line -->
 
 
@@ -42,12 +52,6 @@ simulated_brightness:
 
 ## Exposes
 
-### Action (enum)
-Triggered action (e.g. a button click).
-Value can be found in the published state on the `action` property.
-It's not possible to read (`/get`) or write (`/set`) this value.
-The possible values are: `single`, `double`, `hold`, `brightness_move_to_level`, `color_temperature_move`, `brightness_step_up`, `brightness_step_down`, `on`, `off`.
-
 ### Battery (numeric)
 Remaining battery in %, can take up to 24 hours before reported.
 Value can be found in the published state on the `battery` property.
@@ -62,10 +66,9 @@ To read (`/get`) the value publish a message to topic `zigbee2mqtt/FRIENDLY_NAME
 To write (`/set`) a value publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/set` with payload `{"operation_mode": NEW_VALUE}`.
 The possible values are: `command`, `event`.
 
-### Linkquality (numeric)
-Link quality (signal strength).
-Value can be found in the published state on the `linkquality` property.
+### Action (enum)
+Triggered action (e.g. a button click).
+Value can be found in the published state on the `action` property.
 It's not possible to read (`/get`) or write (`/set`) this value.
-The minimal value is `0` and the maximum value is `255`.
-The unit of this value is `lqi`.
+The possible values are: `single`, `double`, `hold`, `brightness_move_to_level`, `color_temperature_move`, `brightness_step_up`, `brightness_step_down`, `on`, `off`.
 

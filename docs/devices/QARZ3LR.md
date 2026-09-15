@@ -18,8 +18,9 @@ pageClass: device-page
 | Model | QARZ3LR  |
 | Vendor  | [QA](/supported-devices/#v=QA)  |
 | Description | 3 channel long range switch |
-| Exposes | switch (state), power_on_behavior, switch_type, linkquality |
+| Exposes | switch (state), power_on_behavior, switch_type |
 | Picture | ![QA QARZ3LR](https://www.zigbee2mqtt.io/images/devices/QARZ3LR.png) |
+
 
 
 <!-- Notes BEGIN: You can edit here. Add "## Notes" headline if not already present. -->
@@ -31,6 +32,8 @@ pageClass: device-page
 
 ## Options
 *[How to use device type specific configuration](../guide/configuration/devices-groups.md#specific-device-options)*
+
+* `time_start`: Reply to Tuya-specific time synchronization requests: "1970" - Reply with seconds since 1970/01/01 (recommended, should stop the device from asking), "2000" - Reply with seconds since 2000/01/01 (use if the weekday is wrong with 1970), "off" - Don't reply (use if replying causes too much traffic). Default for this device: "off". The value must be one of `1970`, `2000`, `off`
 
 * `state_action`: State actions will also be published as 'action' when true (default false). The value must be `true` or `false`
 
@@ -71,7 +74,7 @@ Support depends on the switch firmware. Some devices might require both `on_time
 Examples : `{"state" : "ON", "on_time": 300}`, `{"state" : "ON", "on_time": 300, "off_wait_time": 120}`.
 
 ### Power-on behavior (enum)
-Controls the behavior when the device is powered on after power loss. If you get an `UNSUPPORTED_ATTRIBUTE` error, the device does not support it..
+Controls the behavior when the device is powered on after power loss.
 Value can be found in the published state on the `power_on_behavior` property.
 To read (`/get`) the value publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/get` with payload `{"power_on_behavior": ""}`.
 To write (`/set`) a value publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/set` with payload `{"power_on_behavior": NEW_VALUE}`.
@@ -83,11 +86,4 @@ Value can be found in the published state on the `switch_type` property.
 To read (`/get`) the value publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/get` with payload `{"switch_type": ""}`.
 To write (`/set`) a value publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/set` with payload `{"switch_type": NEW_VALUE}`.
 The possible values are: `toggle`, `state`, `momentary`.
-
-### Linkquality (numeric)
-Link quality (signal strength).
-Value can be found in the published state on the `linkquality` property.
-It's not possible to read (`/get`) or write (`/set`) this value.
-The minimal value is `0` and the maximum value is `255`.
-The unit of this value is `lqi`.
 

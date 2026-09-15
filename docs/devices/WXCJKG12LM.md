@@ -18,8 +18,9 @@ pageClass: device-page
 | Model | WXCJKG12LM  |
 | Vendor  | [Aqara](/supported-devices/#v=Aqara)  |
 | Description | Opple wireless switch (double band) |
-| Exposes | battery, voltage, operation_mode, action, linkquality |
+| Exposes | battery, voltage, operation_mode, action |
 | Picture | ![Aqara WXCJKG12LM](https://www.zigbee2mqtt.io/images/devices/WXCJKG12LM.png) |
+
 
 
 <!-- Notes BEGIN: You can edit here. Add "## Notes" headline if not already present. -->
@@ -41,12 +42,12 @@ As the device is sleeping by default, you need to wake it up after sending the b
 When endpoint `1` is bound to a light or a group of lights, the behavior is as follows (for a double band model):
 | Button | Click | Action | Comment |
 |-----|-----|-----|-----|
-| Top left | Single<br>Double<br>Long  | Turn off | Using the `commandOff` command. |
-| Top right | Single<br>Double<br>Long  | Turn on | Using the `commandOn` command. |
-| Bottom left | Single | Step down the brightness | In steps of 85 points (33%), using the `step` command.  |
-| Bottom right | Single | Step up the brightness | In steps of 85 points (33%), using the `step` command.  |
-| Bottom left | Double | Step the color temperature down | In steps of 69 mired, using the `stepColorTemp` command.<br>I.e., make it warmer. |
-| Bottom right | Double | Step the color temperature up | In steps of 69 mired, using the `stepColorTemp` command.<br>I.e., make it colder. |
+| Top, Left | Single, Double, Long  | Turn off | Using the `commandOff` command |
+| Top, Right | Single, Double, Long  | Turn on | Using the `commandOn` command |
+| Bottom, Left | Single | Step down the brightness | In steps of 85 points (33%), using the `step` command  |
+| Bottom, Right | Single | Step up the brightness | In steps of 85 points (33%), using the `step` command  |
+| Bottom, Left | Double | Step the color temperature down | In steps of 69 mired, using the `stepColorTemp` command (make it warmer) |
+| Bottom, Right | Double | Step the color temperature up | In steps of 69 mired, using the `stepColorTemp` command (make it colder) |
 
 ### Battery Replacement
 All devices in the Opple line share the same internal design. First, you will need to remove the wireless switch part from its mount.
@@ -85,11 +86,4 @@ Triggered action (e.g. a button click).
 Value can be found in the published state on the `action` property.
 It's not possible to read (`/get`) or write (`/set`) this value.
 The possible values are: `button_1_hold`, `button_1_release`, `button_1_single`, `button_1_double`, `button_1_triple`, `button_2_hold`, `button_2_release`, `button_2_single`, `button_2_double`, `button_2_triple`, `button_3_hold`, `button_3_release`, `button_3_single`, `button_3_double`, `button_3_triple`, `button_4_hold`, `button_4_release`, `button_4_single`, `button_4_double`, `button_4_triple`.
-
-### Linkquality (numeric)
-Link quality (signal strength).
-Value can be found in the published state on the `linkquality` property.
-It's not possible to read (`/get`) or write (`/set`) this value.
-The minimal value is `0` and the maximum value is `255`.
-The unit of this value is `lqi`.
 

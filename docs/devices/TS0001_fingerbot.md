@@ -18,8 +18,9 @@ pageClass: device-page
 | Model | TS0001_fingerbot  |
 | Vendor  | [Tuya](/supported-devices/#v=Tuya)  |
 | Description | Zigbee fingerbot plus |
-| Exposes | switch (state), battery, mode, lower, upper, delay, reverse, touch, linkquality |
+| Exposes | switch (state), battery, mode, lower, upper, delay, reverse, touch |
 | Picture | ![Tuya TS0001_fingerbot](https://www.zigbee2mqtt.io/images/devices/TS0001_fingerbot.png) |
+
 
 
 <!-- Notes BEGIN: You can edit here. Add "## Notes" headline if not already present. -->
@@ -31,6 +32,8 @@ pageClass: device-page
 
 ## Options
 *[How to use device type specific configuration](../guide/configuration/devices-groups.md#specific-device-options)*
+
+* `time_start`: Reply to Tuya-specific time synchronization requests: "1970" - Reply with seconds since 1970/01/01 (recommended, should stop the device from asking), "2000" - Reply with seconds since 2000/01/01 (use if the weekday is wrong with 1970), "off" - Don't reply (use if replying causes too much traffic). Default for this device: "off". The value must be one of `1970`, `2000`, `off`
 
 * `state_action`: State actions will also be published as 'action' when true (default false). The value must be `true` or `false`
 
@@ -94,16 +97,9 @@ To write (`/set`) a value publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/
 If value equals `ON` reverse is ON, if `OFF` OFF.
 
 ### Touch (binary)
-Touch controll.
+Touch control.
 Value can be found in the published state on the `touch` property.
 It's not possible to read (`/get`) this value.
 To write (`/set`) a value publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/set` with payload `{"touch": NEW_VALUE}`.
 If value equals `ON` touch is ON, if `OFF` OFF.
-
-### Linkquality (numeric)
-Link quality (signal strength).
-Value can be found in the published state on the `linkquality` property.
-It's not possible to read (`/get`) or write (`/set`) this value.
-The minimal value is `0` and the maximum value is `255`.
-The unit of this value is `lqi`.
 

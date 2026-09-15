@@ -1,7 +1,7 @@
 ---
-title: "Zemismart M515EGBZTN control via MQTT"
-description: "Integrate your Zemismart M515EGBZTN via Zigbee2MQTT with whatever smart home infrastructure you are using without the vendor's bridge or gateway."
-addedAt: 2022-08-31T11:26:27
+title: "Quoya M515EGBZTN control via MQTT"
+description: "Integrate your Quoya M515EGBZTN via Zigbee2MQTT with whatever smart home infrastructure you are using without the vendor's bridge or gateway."
+addedAt: 2024-09-01T12:36:27
 pageClass: device-page
 ---
 
@@ -11,15 +11,16 @@ pageClass: device-page
 <!-- Do not use h1 or h2 heading within "## Notes"-Section. -->
 <!-- !!!! -->
 
-# Zemismart M515EGBZTN
+# Quoya M515EGBZTN
 
 |     |     |
 |-----|-----|
 | Model | M515EGBZTN  |
-| Vendor  | [Zemismart](/supported-devices/#v=Zemismart)  |
-| Description | Roller shade driver |
-| Exposes | cover (state, position), motor_direction, border, linkquality |
-| Picture | ![Zemismart M515EGBZTN](https://www.zigbee2mqtt.io/images/devices/M515EGBZTN.png) |
+| Vendor  | [Quoya](/supported-devices/#v=Quoya)  |
+| Description | Zigbee roller blind |
+| Exposes | cover (state, position), motor_direction, cover_limit |
+| Picture | ![Quoya M515EGBZTN](https://www.zigbee2mqtt.io/images/devices/M515EGBZTN.png) |
+
 
 
 <!-- Notes BEGIN: You can edit here. Add "## Notes" headline if not already present. -->
@@ -32,7 +33,9 @@ pageClass: device-page
 ## Options
 *[How to use device type specific configuration](../guide/configuration/devices-groups.md#specific-device-options)*
 
-* `invert_cover`: Inverts the cover position, false: open=100,close=0, true: open=0,close=100 (default false). The value must be `true` or `false`
+* `invert_cover`: Inverts the cover position and state, false: open=100,close=0, true: open=0,close=100 (default false). The value must be `true` or `false`
+
+* `time_start`: Reply to Tuya-specific time synchronization requests: "1970" - Reply with seconds since 1970/01/01 (recommended, should stop the device from asking), "2000" - Reply with seconds since 2000/01/01 (use if the weekday is wrong with 1970), "off" - Don't reply (use if replying causes too much traffic). Default for this device: "off". The value must be one of `1970`, `2000`, `off`
 
 
 ## Exposes
@@ -44,21 +47,16 @@ It's not possible to read (`/get`) this value.
 To change the position publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/set` with payload `{"position": VALUE}` where `VALUE` is a number between `0` and `100`.
 
 ### Motor direction (enum)
+Motor rotation direction.
 Value can be found in the published state on the `motor_direction` property.
 It's not possible to read (`/get`) this value.
 To write (`/set`) a value publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/set` with payload `{"motor_direction": NEW_VALUE}`.
-The possible values are: `forward`, `back`.
+The possible values are: `normal`, `reversed`.
 
-### Border (enum)
-Value can be found in the published state on the `border` property.
+### Cover limit (enum)
+Set current position as the limit position.
+Value can be found in the published state on the `cover_limit` property.
 It's not possible to read (`/get`) this value.
-To write (`/set`) a value publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/set` with payload `{"border": NEW_VALUE}`.
-The possible values are: `up`, `down`, `down_delete`.
-
-### Linkquality (numeric)
-Link quality (signal strength).
-Value can be found in the published state on the `linkquality` property.
-It's not possible to read (`/get`) or write (`/set`) this value.
-The minimal value is `0` and the maximum value is `255`.
-The unit of this value is `lqi`.
+To write (`/set`) a value publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/set` with payload `{"cover_limit": NEW_VALUE}`.
+The possible values are: `set_up`, `set_down`, `delete_up`, `delete_down`, `delete_both`.
 

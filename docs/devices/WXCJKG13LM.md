@@ -18,8 +18,9 @@ pageClass: device-page
 | Model | WXCJKG13LM  |
 | Vendor  | [Aqara](/supported-devices/#v=Aqara)  |
 | Description | Opple wireless switch (triple band) |
-| Exposes | battery, voltage, operation_mode, power_outage_count, action, linkquality |
+| Exposes | battery, voltage, operation_mode, power_outage_count, action |
 | Picture | ![Aqara WXCJKG13LM](https://www.zigbee2mqtt.io/images/devices/WXCJKG13LM.png) |
+
 
 
 <!-- Notes BEGIN: You can edit here. Add "## Notes" headline if not already present. -->
@@ -41,16 +42,16 @@ As the device is sleeping by default, you need to wake it up after sending the b
 When endpoint `1` is bound to a light or a group of lights, the behavior is as follows (for a triple band model):
 | Button | Click | Action | Comment |
 |-----|-----|-----|-----|
-| Top<br>left | Single<br>Double<br>Long  | Turn off | Using the `commandOff` command. |
-| Top<br>right | Single<br>Double<br>Long  | Turn on | Using the `commandOn` command. |
-| Middle<br>left | Single<br>Double | Step down the brightness | In steps of 85 points (33%), using the `step` command. |
-| Middle<br>right | Single<br>Double | Step up the brightness | In steps of 85 points (33%), using the `step` command. |
-| Middle<br>left | Long | Smoothly decrease the brightness | In steps of 15 points (around 6%), using the `commandMove` command.<br>Sends the `commandStop` command, on button release. |
-| Middle<br>right | Long | Smoothly increase the brightness | In steps of 15 points (around 6%), using the `commandMove` command.<br>Sends the `commandStop` command, on button release. |
-| Bottom<br>left | Single<br>Double | Step color the temperature down | In steps of 69 mired, using the `stepColorTemp` command.<br>I.e., make it warmer. |
-| Bottom<br>right | Single<br>Double | Step color the temperature up | In steps of 69 mired, using the `stepColorTemp` command.<br>I.e., make it colder. |
-| Bottom<br>left | Double | Smoothly decrease the color temperature | In steps of 15 mired, using the `commandMoveColorTemp` command.<br>I.e., make it warmer. |
-| Bottom<br>right | Double | Smoothly increase the color temperature | In steps of 15 mired, using the `commandMoveColorTemp` command.<br>I.e., make it colder. |
+| Top, Left | Single, Double, Long  | Turn off | Using the `commandOff` command |
+| Top, Right | Single, Double, Long  | Turn on | Using the `commandOn` command |
+| Middle, Left | Single, Double | Step down the brightness | In steps of 85 points (33%), using the `step` command |
+| Middle, Right | Single, Double | Step up the brightness | In steps of 85 points (33%), using the `step` command |
+| Middle, Left | Long | Smoothly decrease the brightness | In steps of 15 points (around 6%), using the `commandMove` command (sends the `commandStop` command, on button release) |
+| Middle, Right | Long | Smoothly increase the brightness | In steps of 15 points (around 6%), using the `commandMove` command (sends the `commandStop` command, on button release) |
+| Bottom, Left | Single, Double | Step color the temperature down | In steps of 69 mired, using the `stepColorTemp` command (make it warmer) |
+| Bottom, Right | Single, Double | Step color the temperature up | In steps of 69 mired, using the `stepColorTemp` command (make it colder) |
+| Bottom, Left | Double | Smoothly decrease the color temperature | In steps of 15 mired, using the `commandMoveColorTemp` command (make it warmer) |
+| Bottom, Right | Double | Smoothly increase the color temperature | In steps of 15 mired, using the `commandMoveColorTemp` command (make it colder) |
 
 ### Battery Replacement
 All devices in the Opple line share the same internal design. First, you will need to remove the wireless switch part from its mount.
@@ -60,11 +61,6 @@ When the logic board is exposed, simply remove it and turn it upside down, where
 <!-- Notes END: Do not edit below this line -->
 
 
-
-## Options
-*[How to use device type specific configuration](../guide/configuration/devices-groups.md#specific-device-options)*
-
-* `legacy`: Set to false to disable the legacy integration (highly recommended), will change structure of the published payload (default true). The value must be `true` or `false`
 
 
 ## Exposes
@@ -99,11 +95,4 @@ Triggered action (e.g. a button click).
 Value can be found in the published state on the `action` property.
 It's not possible to read (`/get`) or write (`/set`) this value.
 The possible values are: `button_1_hold`, `button_1_release`, `button_1_single`, `button_1_double`, `button_1_triple`, `button_2_hold`, `button_2_release`, `button_2_single`, `button_2_double`, `button_2_triple`, `button_3_hold`, `button_3_release`, `button_3_single`, `button_3_double`, `button_3_triple`, `button_4_hold`, `button_4_release`, `button_4_single`, `button_4_double`, `button_4_triple`, `button_5_hold`, `button_5_release`, `button_5_single`, `button_5_double`, `button_5_triple`, `button_6_hold`, `button_6_release`, `button_6_single`, `button_6_double`, `button_6_triple`.
-
-### Linkquality (numeric)
-Link quality (signal strength).
-Value can be found in the published state on the `linkquality` property.
-It's not possible to read (`/get`) or write (`/set`) this value.
-The minimal value is `0` and the maximum value is `255`.
-The unit of this value is `lqi`.
 

@@ -18,8 +18,9 @@ pageClass: device-page
 | Model | TS0601_cover_8  |
 | Vendor  | [Tuya](/supported-devices/#v=Tuya)  |
 | Description | Cover motor |
-| Exposes | cover (state, position), reverse_direction, motor_fault, linkquality |
+| Exposes | cover (state, position), reverse_direction, motor_fault, upper_stroke_limit, middle_stroke_limit, lower_stroke_limit, motor_working_mode |
 | Picture | ![Tuya TS0601_cover_8](https://www.zigbee2mqtt.io/images/devices/TS0601_cover_8.png) |
+
 
 
 <!-- Notes BEGIN: You can edit here. Add "## Notes" headline if not already present. -->
@@ -32,7 +33,9 @@ pageClass: device-page
 ## Options
 *[How to use device type specific configuration](../guide/configuration/devices-groups.md#specific-device-options)*
 
-* `invert_cover`: Inverts the cover position, false: open=100,close=0, true: open=0,close=100 (default false). The value must be `true` or `false`
+* `invert_cover`: Inverts the cover position and state, false: open=100,close=0, true: open=0,close=100 (default false). The value must be `true` or `false`
+
+* `time_start`: Reply to Tuya-specific time synchronization requests: "1970" - Reply with seconds since 1970/01/01 (recommended, should stop the device from asking), "2000" - Reply with seconds since 2000/01/01 (use if the weekday is wrong with 1970), "off" - Don't reply (use if replying causes too much traffic). Default for this device: "off". The value must be one of `1970`, `2000`, `off`
 
 
 ## Exposes
@@ -56,10 +59,31 @@ Value can be found in the published state on the `motor_fault` property.
 It's not possible to read (`/get`) or write (`/set`) this value.
 If value equals `true` motor fault is ON, if `false` OFF.
 
-### Linkquality (numeric)
-Link quality (signal strength).
-Value can be found in the published state on the `linkquality` property.
-It's not possible to read (`/get`) or write (`/set`) this value.
-The minimal value is `0` and the maximum value is `255`.
-The unit of this value is `lqi`.
+### Upper stroke limit (enum)
+Set or Reset the upper stroke limit.
+Value can be found in the published state on the `upper_stroke_limit` property.
+It's not possible to read (`/get`) this value.
+To write (`/set`) a value publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/set` with payload `{"upper_stroke_limit": NEW_VALUE}`.
+The possible values are: `SET`, `RESET`.
+
+### Middle stroke limit (enum)
+Set or Reset the middle stroke limit.
+Value can be found in the published state on the `middle_stroke_limit` property.
+It's not possible to read (`/get`) this value.
+To write (`/set`) a value publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/set` with payload `{"middle_stroke_limit": NEW_VALUE}`.
+The possible values are: `SET`, `RESET`.
+
+### Lower stroke limit (enum)
+Set or Reset the lower stroke limit.
+Value can be found in the published state on the `lower_stroke_limit` property.
+It's not possible to read (`/get`) this value.
+To write (`/set`) a value publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/set` with payload `{"lower_stroke_limit": NEW_VALUE}`.
+The possible values are: `SET`, `RESET`.
+
+### Motor working mode (enum)
+Motor operating mode.
+Value can be found in the published state on the `motor_working_mode` property.
+It's not possible to read (`/get`) this value.
+To write (`/set`) a value publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/set` with payload `{"motor_working_mode": NEW_VALUE}`.
+The possible values are: `continuous`, `intermittently`.
 

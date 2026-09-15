@@ -1,6 +1,6 @@
 ---
-title: "Tuya TS0601_switch_8 control via MQTT"
-description: "Integrate your Tuya TS0601_switch_8 via Zigbee2MQTT with whatever smart home infrastructure you are using without the vendor's bridge or gateway."
+title: "ZYXH TS0601_switch_8 control via MQTT"
+description: "Integrate your ZYXH TS0601_switch_8 via Zigbee2MQTT with whatever smart home infrastructure you are using without the vendor's bridge or gateway."
 addedAt: 2023-06-01T08:09:29
 pageClass: device-page
 ---
@@ -11,23 +11,34 @@ pageClass: device-page
 <!-- Do not use h1 or h2 heading within "## Notes"-Section. -->
 <!-- !!!! -->
 
-# Tuya TS0601_switch_8
+# ZYXH TS0601_switch_8
 
 |     |     |
 |-----|-----|
 | Model | TS0601_switch_8  |
-| Vendor  | [Tuya](/supported-devices/#v=Tuya)  |
-| Description | ZYXH 8 gang switch |
-| Exposes | switch (state), linkquality |
-| Picture | ![Tuya TS0601_switch_8](https://www.zigbee2mqtt.io/images/devices/TS0601_switch_8.png) |
+| Vendor  | [ZYXH](/supported-devices/#v=ZYXH)  |
+| Description | 8 gang switch |
+| Exposes | switch (state) |
+| Picture | ![ZYXH TS0601_switch_8](https://www.zigbee2mqtt.io/images/devices/TS0601_switch_8.png) |
+
 
 
 <!-- Notes BEGIN: You can edit here. Add "## Notes" headline if not already present. -->
+## Notes
 
+### Pairing
+Long press any button for 5 seconds until the LED indicator starts flashing rapidly to enter pairing mode.
 
+### Endpoints
+This device exposes 8 switches through endpoints l1-l8. Each switch can be controlled independently.
 <!-- Notes END: Do not edit below this line -->
 
 
+
+## Options
+*[How to use device type specific configuration](../guide/configuration/devices-groups.md#specific-device-options)*
+
+* `time_start`: Reply to Tuya-specific time synchronization requests: "1970" - Reply with seconds since 1970/01/01 (recommended, should stop the device from asking), "2000" - Reply with seconds since 2000/01/01 (use if the weekday is wrong with 1970), "off" - Don't reply (use if replying causes too much traffic). Default for this device: "off". The value must be one of `1970`, `2000`, `off`
 
 
 ## Exposes
@@ -71,11 +82,4 @@ It's not possible to read (`/get`) this value.
 The current state of this switch is in the published state under the `state_l8` property (value is `ON` or `OFF`).
 To control this switch publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/set` with payload `{"state_l8": "ON"}`, `{"state_l8": "OFF"}` or `{"state_l8": "TOGGLE"}`.
 It's not possible to read (`/get`) this value.
-
-### Linkquality (numeric)
-Link quality (signal strength).
-Value can be found in the published state on the `linkquality` property.
-It's not possible to read (`/get`) or write (`/set`) this value.
-The minimal value is `0` and the maximum value is `255`.
-The unit of this value is `lqi`.
 

@@ -18,9 +18,10 @@ pageClass: device-page
 | Model | MCCGQ12LM  |
 | Vendor  | [Aqara](/supported-devices/#v=Aqara)  |
 | Description | Door and window sensor T1 |
-| Exposes | contact, battery, voltage, linkquality |
+| Exposes | contact, battery, voltage |
 | Picture | ![Aqara MCCGQ12LM](https://www.zigbee2mqtt.io/images/devices/MCCGQ12LM.png) |
 | White-label | Aqara DW-S03D, Yandex YNDX-00520 |
+
 
 
 <!-- Notes BEGIN: You can edit here. Add "## Notes" headline if not already present. -->
@@ -46,9 +47,6 @@ E.g. (devices.yaml)
 <!-- Notes END: Do not edit below this line -->
 
 
-## OTA updates
-This device supports OTA updates, for more information see [OTA updates](../guide/usage/ota_updates.md).
-
 
 
 ## Exposes
@@ -71,11 +69,4 @@ Voltage of the battery in millivolts.
 Value can be found in the published state on the `voltage` property.
 It's not possible to read (`/get`) or write (`/set`) this value.
 The unit of this value is `mV`.
-
-### Linkquality (numeric)
-Link quality (signal strength).
-Value can be found in the published state on the `linkquality` property.
-It's not possible to read (`/get`) or write (`/set`) this value.
-The minimal value is `0` and the maximum value is `255`.
-The unit of this value is `lqi`.
 

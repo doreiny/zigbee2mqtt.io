@@ -18,8 +18,9 @@ pageClass: device-page
 | Model | PSBZS A1  |
 | Vendor  | [Lidl](/supported-devices/#v=Lidl)  |
 | Description | Parkside smart watering timer |
-| Exposes | battery, switch (state), timer, time_left, frost_lock, reset_frost_lock, schedule_mode, schedule_periodic, schedule_weekday, schedule_slot_1, schedule_slot_2, schedule_slot_3, schedule_slot_4, schedule_slot_5, schedule_slot_6, linkquality |
+| Exposes | battery, switch (state), timer, time_left, frost_lock, reset_frost_lock, schedule_mode, schedule_periodic, schedule_weekday, schedule_slot_1, schedule_slot_2, schedule_slot_3, schedule_slot_4, schedule_slot_5, schedule_slot_6 |
 | Picture | ![Lidl PSBZS A1](https://www.zigbee2mqtt.io/images/devices/PSBZS-A1.png) |
+
 
 
 <!-- Notes BEGIN: You can edit here. Add "## Notes" headline if not already present. -->
@@ -28,6 +29,11 @@ pageClass: device-page
 <!-- Notes END: Do not edit below this line -->
 
 
+
+## Options
+*[How to use device type specific configuration](../guide/configuration/devices-groups.md#specific-device-options)*
+
+* `time_start`: Reply to Tuya-specific time synchronization requests: "1970" - Reply with seconds since 1970/01/01 (recommended, should stop the device from asking), "2000" - Reply with seconds since 2000/01/01 (use if the weekday is wrong with 1970), "off" - Don't reply (use if replying causes too much traffic). Default for this device: "1970". The value must be one of `1970`, `2000`, `off`
 
 
 ## Exposes
@@ -155,11 +161,4 @@ Can be set by publishing to `zigbee2mqtt/FRIENDLY_NAME/set` with payload `{"sche
 - `timer` (numeric): Auto off after specific time for scheduled watering. min value is 1, max value is 599, unit is min
 - `pause` (numeric): Pause after each iteration. max value is 599, unit is min
 - `iterations` (numeric): Number of watering iterations. Works only if there is a pause. min value is 1, max value is 9
-
-### Linkquality (numeric)
-Link quality (signal strength).
-Value can be found in the published state on the `linkquality` property.
-It's not possible to read (`/get`) or write (`/set`) this value.
-The minimal value is `0` and the maximum value is `255`.
-The unit of this value is `lqi`.
 

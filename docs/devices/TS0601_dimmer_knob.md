@@ -18,9 +18,10 @@ pageClass: device-page
 | Model | TS0601_dimmer_knob  |
 | Vendor  | [Tuya](/supported-devices/#v=Tuya)  |
 | Description | Zigbee smart knob dimmer |
-| Exposes | light (state, brightness, min_brightness), light_type, indicator_mode, linkquality |
+| Exposes | light (state, brightness, min_brightness), light_type, indicator_mode |
 | Picture | ![Tuya TS0601_dimmer_knob](https://www.zigbee2mqtt.io/images/devices/TS0601_dimmer_knob.png) |
 | White-label | Moes WS-SY-EURD, Moes WS-SY-EURD-WH-MS |
+
 
 
 <!-- Notes BEGIN: You can edit here. Add "## Notes" headline if not already present. -->
@@ -35,13 +36,20 @@ To pair the device, the knob must be pressed for 5 sec. Sometimes, the pairing m
 
 
 
+## Options
+*[How to use device type specific configuration](../guide/configuration/devices-groups.md#specific-device-options)*
+
+* `time_start`: Reply to Tuya-specific time synchronization requests: "1970" - Reply with seconds since 1970/01/01 (recommended, should stop the device from asking), "2000" - Reply with seconds since 2000/01/01 (use if the weekday is wrong with 1970), "off" - Don't reply (use if replying causes too much traffic). Default for this device: "off". The value must be one of `1970`, `2000`, `off`
+
 
 ## Exposes
 
 ### Light 
 This light supports the following features: `state`, `brightness`, `min_brightness`.
 - `state`: To control the state publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/set` with payload `{"state": "ON"}`, `{"state": "OFF"}` or `{"state": "TOGGLE"}`. To read the state send a message to `zigbee2mqtt/FRIENDLY_NAME/get` with payload `{"state": ""}`.
+                
 - `brightness`: To control the brightness publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/set` with payload `{"brightness": VALUE}` where `VALUE` is a number between `0` and `254`. To read the brightness send a message to `zigbee2mqtt/FRIENDLY_NAME/get` with payload `{"brightness": ""}`.
+                
 
 ### Light type (enum)
 Type of light attached to the device.
@@ -56,11 +64,4 @@ Value can be found in the published state on the `indicator_mode` property.
 To read (`/get`) the value publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/get` with payload `{"indicator_mode": ""}`.
 To write (`/set`) a value publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/set` with payload `{"indicator_mode": NEW_VALUE}`.
 The possible values are: `none`, `relay`, `pos`.
-
-### Linkquality (numeric)
-Link quality (signal strength).
-Value can be found in the published state on the `linkquality` property.
-It's not possible to read (`/get`) or write (`/set`) this value.
-The minimal value is `0` and the maximum value is `255`.
-The unit of this value is `lqi`.
 

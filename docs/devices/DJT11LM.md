@@ -18,8 +18,9 @@ pageClass: device-page
 | Model | DJT11LM  |
 | Vendor  | [Aqara](/supported-devices/#v=Aqara)  |
 | Description | Vibration sensor |
-| Exposes | battery, device_temperature, vibration, strength, sensitivity, angle_x, angle_y, angle_z, x_axis, y_axis, z_axis, voltage, power_outage_count, action, linkquality |
+| Exposes | battery, device_temperature, vibration, strength, sensitivity, angle_x, angle_y, angle_z, x_axis, y_axis, z_axis, voltage, power_outage_count, action |
 | Picture | ![Aqara DJT11LM](https://www.zigbee2mqtt.io/images/devices/DJT11LM.png) |
+
 
 
 <!-- Notes BEGIN: You can edit here. Add "## Notes" headline if not already present. -->
@@ -51,13 +52,6 @@ Most of the times this happens because of the following reasons:
 
 More detailed information about this can be found [here](https://community.hubitat.com/t/xiaomi-aqara-devices-pairing-keeping-them-connected/623).
 
-### Sensitivity
-The sensitivity can be changed by publishing to `zigbee2mqtt/FRIENDLY_NAME/set`
-`{"sensitivity": "SENSITIVITY"}` where `SENSITIVITY` is one of the following
-values: `low`, `medium`,  `high`.
-
-After setting the sensitivity you immediately have to start pressing the reset button with an interval of 1 second until you see Zigbee2MQTT publishing the new sensitivity to MQTT.
-
 
 ### Calibration
 In order to improve the factory calibration or lack thereof, you can get a better result with a 2 step offset calibration:
@@ -71,6 +65,16 @@ In order to improve the factory calibration or lack thereof, you can get a bette
   * Set the offset for z to the opposite of ``z_axis``
 You can fine tune the values of the offset by trying other sides and picking values that match best.
 Remember that the device sends accelerometer values a few seconds after the actual tilt event.
+
+
+**Important note on software-based calibration**  
+The calibration offsets (`x_calibration`, `y_calibration`, `z_calibration`) are only applied **inside** Zigbee2MQTT after the sensor has already sent its raw data. This means:
+
+
+**Raw values** (`x_axis`, `y_axis`, `z_axis`) in logs, MQTT messages, and the Zigbee2MQTT UI will remain the same as reported by the hardware.  
+- The offsets will *not* change what Home Assistant (or other software) sees if you are directly reading those raw properties.  
+- If you want to work with the "corrected" or "calibrated" values in another system (e.g., Home Assistant), you would need to create a [template sensor](https://www.home-assistant.io/integrations/template/) or otherwise apply the offsets yourself.  
+- Seeing the same raw numbers after setting offsets does **not** mean calibration isn't working—it's simply that the sensor output itself is never altered by the offsets.
 <!-- Notes END: Do not edit below this line -->
 
 
@@ -114,11 +118,12 @@ If value equals `true` vibration is ON, if `false` OFF.
 Value can be found in the published state on the `strength` property.
 It's not possible to read (`/get`) or write (`/set`) this value.
 
-### Sensitivity (enum)
+### Sensitivity (numeric)
+Sensitivity, 1 = highest, 21 = lowest.
 Value can be found in the published state on the `sensitivity` property.
 It's not possible to read (`/get`) this value.
 To write (`/set`) a value publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/set` with payload `{"sensitivity": NEW_VALUE}`.
-The possible values are: `low`, `medium`, `high`.
+The minimal value is `1` and the maximum value is `21`.
 
 ### Angle x (numeric)
 Value can be found in the published state on the `angle_x` property.
@@ -169,11 +174,4 @@ Triggered action (e.g. a button click).
 Value can be found in the published state on the `action` property.
 It's not possible to read (`/get`) or write (`/set`) this value.
 The possible values are: `vibration`, `tilt`, `drop`.
-
-### Linkquality (numeric)
-Link quality (signal strength).
-Value can be found in the published state on the `linkquality` property.
-It's not possible to read (`/get`) or write (`/set`) this value.
-The minimal value is `0` and the maximum value is `255`.
-The unit of this value is `lqi`.
 

@@ -18,8 +18,9 @@ pageClass: device-page
 | Model | SWV  |
 | Vendor  | [SONOFF](/supported-devices/#v=SONOFF)  |
 | Description | Zigbee smart water valve |
-| Exposes | flow, battery, switch (state), current_device_status, cyclic_timed_irrigation, cyclic_quantitative_irrigation, linkquality |
+| Exposes | flow, battery, switch (state), current_device_status, auto_close_when_water_shortage, cyclic_timed_irrigation, cyclic_quantitative_irrigation, real_time_irrigation_duration, real_time_irrigation_volume, irrigation_start_time, irrigation_end_time, daily_irrigation_volume, valve_work_state |
 | Picture | ![SONOFF SWV](https://www.zigbee2mqtt.io/images/devices/SWV.png) |
+
 
 
 <!-- Notes BEGIN: You can edit here. Add "## Notes" headline if not already present. -->
@@ -72,6 +73,13 @@ To read (`/get`) the value publish a message to topic `zigbee2mqtt/FRIENDLY_NAME
 It's not possible to write (`/set`) this value.
 The possible values are: `normal_state`, `water_shortage`, `water_leakage`, `water_shortage & water_leakage`.
 
+### Auto close when water shortage (binary)
+Automatically shut down the water valve after the water shortage exceeds 30 minutes. Requires firmware version 1.0.4 or later!.
+Value can be found in the published state on the `auto_close_when_water_shortage` property.
+To read (`/get`) the value publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/get` with payload `{"auto_close_when_water_shortage": ""}`.
+To write (`/set`) a value publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/set` with payload `{"auto_close_when_water_shortage": NEW_VALUE}`.
+If value equals `ENABLE` auto close when water shortage is ON, if `DISABLE` OFF.
+
 ### Cyclic timed irrigation (composite)
 Smart water valve cycle timing irrigation.
 Can be set by publishing to `zigbee2mqtt/FRIENDLY_NAME/set` with payload `{"cyclic_timed_irrigation": {"current_count": VALUE, "total_number": VALUE, "irrigation_duration": VALUE, "irrigation_interval": VALUE}}`
@@ -90,10 +98,37 @@ To read (`/get`) the value publish a message to topic `zigbee2mqtt/FRIENDLY_NAME
 - `irrigation_capacity` (numeric): Single irrigation capacity max value is 6500, unit is liter
 - `irrigation_interval` (numeric): Time interval between two adjacent irrigation max value is 86400, unit is seconds
 
-### Linkquality (numeric)
-Link quality (signal strength).
-Value can be found in the published state on the `linkquality` property.
+### Real time irrigation duration (numeric)
+Duration of the last/current irrigation session.
+Value can be found in the published state on the `real_time_irrigation_duration` property.
 It's not possible to read (`/get`) or write (`/set`) this value.
-The minimal value is `0` and the maximum value is `255`.
-The unit of this value is `lqi`.
+The unit of this value is `s`.
+
+### Real time irrigation volume (numeric)
+Volume of the last/current irrigation session.
+Value can be found in the published state on the `real_time_irrigation_volume` property.
+It's not possible to read (`/get`) or write (`/set`) this value.
+The unit of this value is `L`.
+
+### Irrigation start time (numeric)
+Start time of the last/current irrigation session (Unix timestamp).
+Value can be found in the published state on the `irrigation_start_time` property.
+It's not possible to read (`/get`) or write (`/set`) this value.
+
+### Irrigation end time (numeric)
+End time of the last irrigation session (Unix timestamp).
+Value can be found in the published state on the `irrigation_end_time` property.
+It's not possible to read (`/get`) or write (`/set`) this value.
+
+### Daily irrigation volume (numeric)
+Total irrigation volume today.
+Value can be found in the published state on the `daily_irrigation_volume` property.
+It's not possible to read (`/get`) or write (`/set`) this value.
+The unit of this value is `L`.
+
+### Valve work state (binary)
+Current valve work state, this turns on when a Cyclic timed or quantitative irrigation program is running, and turns off when the program is complete..
+Value can be found in the published state on the `valve_work_state` property.
+It's not possible to read (`/get`) or write (`/set`) this value.
+If value equals `working` valve work state is ON, if `idle` OFF.
 

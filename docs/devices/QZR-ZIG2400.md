@@ -18,8 +18,9 @@ pageClass: device-page
 | Model | QZR-ZIG2400  |
 | Vendor  | [Qmotion](/supported-devices/#v=Qmotion)  |
 | Description | 5 channel remote |
-| Exposes | action, position, linkquality |
+| Exposes | action, position |
 | Picture | ![Qmotion QZR-ZIG2400](https://www.zigbee2mqtt.io/images/devices/QZR-ZIG2400.png) |
+
 
 
 <!-- Notes BEGIN: You can edit here. Add "## Notes" headline if not already present. -->
@@ -32,7 +33,7 @@ pageClass: device-page
 ## Options
 *[How to use device type specific configuration](../guide/configuration/devices-groups.md#specific-device-options)*
 
-* `invert_cover`: Inverts the cover position, false: open=100,close=0, true: open=0,close=100 (default false). The value must be `true` or `false`
+* `invert_cover`: Inverts the cover position and state, false: open=100,close=0, true: open=0,close=100 (default false). The value must be `true` or `false`
 
 
 ## Exposes
@@ -46,11 +47,4 @@ The possible values are: `identify`.
 ### Position (numeric)
 Value can be found in the published state on the `position` property.
 It's not possible to read (`/get`) or write (`/set`) this value.
-
-### Linkquality (numeric)
-Link quality (signal strength).
-Value can be found in the published state on the `linkquality` property.
-It's not possible to read (`/get`) or write (`/set`) this value.
-The minimal value is `0` and the maximum value is `255`.
-The unit of this value is `lqi`.
 

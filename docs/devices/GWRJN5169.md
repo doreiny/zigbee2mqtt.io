@@ -17,20 +17,23 @@ pageClass: device-page
 |-----|-----|
 | Model | GWRJN5169  |
 | Vendor  | [OpenLumi](/supported-devices/#v=OpenLumi)  |
-| Description | Lumi Router (JN5169) |
-| Exposes | device_temperature, linkquality |
+| Description | Lumi Router (outdated firmware, update required) |
+| Exposes | device_temperature |
 | Picture | ![OpenLumi GWRJN5169](https://www.zigbee2mqtt.io/images/devices/GWRJN5169.png) |
+
 
 
 <!-- Notes BEGIN: You can edit here. Add "## Notes" headline if not already present. -->
 ## Notes
-[Lumi Router (JN5169)](https://github.com/igo-r/Lumi-Router-JN5169)
-
 
 ### Firmware
-Zigbee Router for __Xiaomi DGNWG05LM__ and __Aqara ZHWG11LM__ gateways.
 
-Open source firmware can be found here: [Github](https://github.com/igo-r/Lumi-Router-JN5169)
+This legacy firmware used a single build for both the **Xiaomi DGNWG05LM** and **Aqara ZHWG11LM** gateways. It has been replaced by two separate, substantially revised firmware variants, each designed specifically for one gateway model. Update to the appropriate version:
+
+* [LR-DGNWG05LM](LR-DGNWG05LM.md) for the Xiaomi DGNWG05LM
+* [LR-ZHWG11LM](LR-ZHWG11LM.md) for the Aqara ZHWG11LM
+
+Open source firmware and flashing instructions can be found on [GitHub](https://github.com/igorlistopad/Lumi-Router-JN5169).
 <!-- Notes END: Do not edit below this line -->
 
 
@@ -46,13 +49,7 @@ Open source firmware can be found here: [Github](https://github.com/igo-r/Lumi-R
 ### Device temperature (numeric)
 Temperature of the device.
 Value can be found in the published state on the `device_temperature` property.
-It's not possible to read (`/get`) or write (`/set`) this value.
+To read (`/get`) the value publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/get` with payload `{"device_temperature": ""}`.
+It's not possible to write (`/set`) this value.
 The unit of this value is `°C`.
-
-### Linkquality (numeric)
-Link quality (signal strength).
-Value can be found in the published state on the `linkquality` property.
-It's not possible to read (`/get`) or write (`/set`) this value.
-The minimal value is `0` and the maximum value is `255`.
-The unit of this value is `lqi`.
 

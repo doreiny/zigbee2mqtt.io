@@ -52,7 +52,7 @@ export async function downloadMissing() {
         console.log(`Querying '${query}'`);
         // @ts-expect-error
         const images: {url: string}[] = (await gis(`${definition.model} ${definition.vendor}`))
-            .filter((r) => r.url.endsWith('.webp') || r.url.endsWith('.jpg') || r.url.endsWith('.jpeg') || r.url.endsWith('.png'))
+            .filter((r: {url: string}) => r.url.endsWith('.webp') || r.url.endsWith('.jpg') || r.url.endsWith('.jpeg') || r.url.endsWith('.png'))
             .slice(0, 5);
         for (const image of images) {
             let imagePath = path.join(
@@ -88,7 +88,7 @@ export async function downloadMissing() {
         }
     }
 
-    console.log(`Done! Filter and update all the files under '${missingImagesPath}', execute 'npm run move-missing-device-images'`);
+    console.log(`Done! Filter and update all the files under '${missingImagesPath}', execute 'pnpm run move-missing-device-images'`);
 }
 
 export async function prepareMissing() {
@@ -119,7 +119,18 @@ export async function prepareMissing() {
             if (fs.existsSync(imagePath)) fs.rmSync(imagePath);
         }
     }
-    console.log(`Done! Filter and update all the files under '${missingImagesPath}', execute 'npm run move-missing-device-images'`);
+    console.log(`Done! Filter and update all the files under '${missingImagesPath}', execute 'pnpm run move-missing-device-images'`);
+}
+
+export async function copyMissing() {
+    const source = path.join(imageBaseDir, 'no_image_available.png');
+    const missing = await getMissing();
+
+    for (const definition of missing) {
+        fs.copyFileSync(source, definition.image);
+    }
+
+    console.log(`Copied '${source}' to ${missing.length} missing device images.`);
 }
 
 async function moveMissing() {
@@ -128,7 +139,7 @@ async function moveMissing() {
             let source = path.join(missingImagesPath, file);
             // source = await ensurePngWithoutBackground(source);
             const name = path.basename(source);
-            const match = name.match('(.+)_\\d+\\.png');
+            const match = name.match('(.+).png');
             if (!match) throw new Error(`Failed to match '${name}'`);
             const target = path.join(imageBaseDir, `${match[1]}.png`);
             fs.copyFileSync(source, target);
@@ -152,6 +163,8 @@ if (require.main === module) {
             await downloadMissing();
         } else if (arg === 'prepare') {
             await prepareMissing();
+        } else if (arg === 'copy') {
+            await copyMissing();
         } else if (arg === 'move') {
             await moveMissing();
         } else {

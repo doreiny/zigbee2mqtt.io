@@ -18,8 +18,9 @@ pageClass: device-page
 | Model | TS0207_repeater  |
 | Vendor  | [Tuya](/supported-devices/#v=Tuya)  |
 | Description | Repeater |
-| Exposes | linkquality |
+| Exposes |  |
 | Picture | ![Tuya TS0207_repeater](https://www.zigbee2mqtt.io/images/devices/TS0207_repeater.png) |
+
 
 
 <!-- Notes BEGIN: You can edit here. Add "## Notes" headline if not already present. -->
@@ -38,10 +39,5 @@ The range extender is in pairing mode straight out of the box - allow new device
 
 ## Exposes
 
-### Linkquality (numeric)
-Link quality (signal strength).
-Value can be found in the published state on the `linkquality` property.
-It's not possible to read (`/get`) or write (`/set`) this value.
-The minimal value is `0` and the maximum value is `255`.
-The unit of this value is `lqi`.
+
 

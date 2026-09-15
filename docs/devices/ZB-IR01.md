@@ -17,99 +17,84 @@ pageClass: device-page
 |-----|-----|
 | Model | ZB-IR01  |
 | Vendor  | [easyiot](/supported-devices/#v=easyiot)  |
-| Description | This is an infrared remote control equipped with a local code library,supporting devices such as air conditioners, televisions, projectors, and more. |
-| Exposes | last_received_command, send_command, linkquality |
+| Description | Infrared remote control equipped with local code library, |
+| Exposes | last_received_command, send_command, ac_kfid_offset_model, ac_power, ac_mode, ac_temperature, ac_wind_speed |
 | Picture | ![easyiot ZB-IR01](https://www.zigbee2mqtt.io/images/devices/ZB-IR01.png) |
+
 
 
 <!-- Notes BEGIN: You can edit here. Add "## Notes" headline if not already present. -->
 ## Notes
-## 1 Protocol Overview
+## 1. Protocol Overview
 
+### 1.1 Description of ZCL Communication for Custom Gateway Access
 
-### 1.1 Description of ZCL communication method for accessing your own gateway
+To integrate the smart infrared remote control with a custom gateway, users should refer to the standard cluster specifications in the [07-5123-07-ZigbeeClusterLibrary_Revision_7.pdf](https://csa-iot.org/developer-resource/specifications-download-request/) protocol document.
 
-Users who develop their own gateway to access smart infrared remote control should refer to the standard cluster of the [07-5123-07-ZigbeeClusterLibrary_Revision_7.pdf](https://csa-iot.org/developer-resource/specifications-download-request/) protocol document to access it.
-
-#### 1.1.1 Cluster identifier
+#### 1.1.1 Cluster Identifier
 
 | **Identifier** | **Name**                |
 | -------------- | ----------------------- |
-| **0x0704**     | Tunneling(Smart Energy) |
+| **0x0704**     | Tunneling (Smart Energy) |
 
 Table 1
 
-#### 1.1.2 Agreement process description
+#### 1.1.2 Protocol Process Description
 
-In order to simplify the communication process, the creation of transparent transmission channels required by the cluster is omitted, and transparent transmission commands are directly used to send and receive commands. The channel ID is fixed at 0.
+To simplify communication, the creation of transparent transmission channels required by the cluster is omitted. Transparent transmission commands are used directly to send and receive commands, with the channel ID fixed at 0.
 
-##### 1.1.2.1 Send data
+##### 1.1.2.1 Sending Data
 
-Use the [10.6.2.4.3 TransferData Command] command, the key parameters are as follows
+Use the [10.6.2.4.3 TransferData Command], with the following key parameters:
 
-Direction: Client->Server
-
- 
+Direction: Client -> Server
 
 | **Description**                      | **Length** | **Value**                       |
 | ------------------------------------ | ---------- | ------------------------------- |
 | **Cluster Command**                  | 1          | 0x02                            |
 | **TunnelID**                         | 2          | 0x0000                          |
-| **Transparent transmission of data** | 6          | The protocol shown in Chapter 3 |
+| **Transparent Transmission Data**    | 6          | As shown in Chapter 3           |
 
 Table 2
 
+##### 1.1.2.2 Receiving Data from the Infrared Remote Control
 
-##### 1.3.2.2 Receive feedback data from infrared remote control
+Use the [10.6.2.5.2 TransferData Command] with the following parameters:
 
-Use the [10.6.2.5.2 TransferData Command] command, the key parameters are as follows
-
-Direction: Server –>Client
-
- 
-
- 
-
- 
+Direction: Server -> Client
 
 | **Description**                      | **Length** | **Value**                       |
 | ------------------------------------ | ---------- | ------------------------------- |
 | **Cluster Command**                  | 1          | 0x01                            |
 | **TunnelID**                         | 2          | 0x0000                          |
-| **Transparent transmission of data** | 6          | The protocol shown in Chapter 3 |
+| **Transparent Transmission Data**    | 6          | As shown in Chapter 3           |
 
 Table 3
 
+### 1.2 Infrared Remote Control Protocol Overview
 
-### 1.2 Introduction to infrared remote control protocol
+#### 1.2.1 Request Data Frame
 
-#### 1.2.1 Request data frame
-
-| Command | Data 1 | Data 2 | Data 3 | Data 4 | XOR check |
+| Command | Data 1 | Data 2 | Data 3 | Data 4 | XOR Check |
 | ------- | ------ | ------ | ------ | ------ | --------- |
 | 0x##    | 0x##   | 0x##   | 0x##   | 0x##   | 0x##      |
 
-#### 1.2.2 Response data frame
+#### 1.2.2 Response Data Frame
 
-| Command | Data 1 | Data 2 | Data 3 | Data 4 | XOR check |
+| Command | Data 1 | Data 2 | Data 3 | Data 4 | XOR Check |
 | ------- | ------ | ------ | ------ | ------ | --------- |
 | 0x06    | 0x##   | 0x##   | 0x##   | 0x##   | 0x##      |
 
-Detailed explanation of frame data
+Detailed Explanation of Frame Data
 
-Command: The data request frame is 0x80-0x92, with reserved frame data in the middle
+- **Command**: The request frame ranges from 0x80 to 0x92, with reserved data in between.
+- **Data**: The response frame is fixed at 0x06. Each request frame sent will receive a response frame.
+- **Reporting Frame**: The data reporting frame is fixed at 0x08, used to report the status of the air conditioner after remote control.
+- **XOR Check**: A simple XOR-based checksum.
 
-The data response frame is fixed at 0x06. Every time a data request frame is sent, a data response frame will be received.
+#### 1.2.3 XOR Verification Algorithm (XOR and Validation)
 
-The data reporting frame is fixed at 0x08, which reports the status of the air conditioner after it is remotely controlled.
-
-Data: Data transmitted to the infrared remote control
-
-XOR check: XOR and check
-
-#### 1.2.3 XOR verification algorithm (XOR and verification)
-
-* This is the pseudo code of BCC check
+* Pseudo-code for BCC check:
 
 ```c
 Function CalcXOR(msgPtr, len):
@@ -126,15 +111,13 @@ Function CalcXOR(msgPtr, len):
 
 [bcc tools download](https://drive.google.com/file/d/1TD01Xk96JKfwNW9OtdslQOVTc1yHSI47/view?usp=drive_link)
 
-![BCC Tool Usage][img1]
-
 ## 2 Basic functions
 
 ### 2.1 Device type definition
 
-This infrared remote control defines 8 device remote control types (2 of which are custom learning types), which can be switched freely with commands during use.
+This infrared remote control defines 8 device remote control types (2 of which are custom learning types), and they can be switched freely with commands during use.
 
-Among them, the custom learning type can learn 32 buttons each. The button names are saved by the host, and the remote control does not distinguish the button functions.
+Among them, the custom learning type can learn 32 buttons each. The button names are saved by the host, and the remote control does not distinguish between button functions.
 
 | **Device Type** | **Type Definition**    |
 | --------------- | ---------------------- |
@@ -157,21 +140,26 @@ Table 4
 | ------- | ----------- | ------ | ------ | -------- | --------- |
 | 0x80    | 0x##        | 0x##   | 0x##   | 0x00     | 0x##      |
 
-Function: Create a new remote control. You must create a remote control before using the remote control, otherwise other calls will fail or be incorrect.
+**Function**: Create a new remote control. You must create a remote control before using it, otherwise other calls will fail or return incorrect results.
 
-Command: 0x80
+**Command**: 0x80
 
-Device type: For the type of remote control that needs to be created, refer to Table 4.
+**Device type**: For the type of remote control to be created, refer to Table 4.
 
-Kfid: A 16bit remote control ID
+**Kfid**: A 16-bit remote control ID
 
-Obtain Kfid: a, call the one-click matching interface to obtain
+To generate the checksum (XOR check), you can use the **BCC calculation tool** from the provided link:
 
-b. Obtained by consulting the brand and model correspondence table(table 11 - table 14).
+- [BCC tools download](https://drive.google.com/file/d/1TD01Xk96JKfwNW9OtdslQOVTc1yHSI47/view?usp=drive_link)
 
-Return: Success: 0x06,0x89,0x00,0x00,0x00,0x8F
 
-Failure: 0x06,0xE0,0xE1,0x00,0x00,0x07 Error code: 0xE1 The meaning is shown in Table 5
+Obtain Kfid: 
+a. Call the one-click matching interface to obtain  
+b. Obtain by consulting the brand and model correspondence table (table 11 - table 14).
+
+Return: Success: 0x06,0x89,0x00,0x00,0x00,0x8F  
+Failure: 0x06,0xE0,0xE1,0x00,0x00,0x07  
+Error code: 0xE1 The meaning is shown in Table 5
 
 ### 3.2 One-click matching
 
@@ -179,17 +167,17 @@ Failure: 0x06,0xE0,0xE1,0x00,0x00,0x07 Error code: 0xE1 The meaning is shown in 
 | ------- | ----------- | ------ | ------ | -------- | --------- |
 | 0x81    | 0x##        | 0x00   | 0x00   | 0x00     | 0x##      |
 
-Function: Use the original remote control to send the power on button to the Zigbee infrared remote control to search for the ID corresponding to the local code library. After the ZIGBEE infrared remote control receives the matching command, the indicator light flashes, prompting the user to press the power button of the remote control. After the search is successful, a 16-bit value (Kfid_H, Kfid_L) will be returned. If no signal is received for more than 10 seconds, it will Return failure.
+**Function**: Use the original remote control to send the power on button to the Zigbee infrared remote control to search for the ID corresponding to the local code library. After the Zigbee infrared remote control receives the matching command, the indicator light will flash, prompting the user to press the power button of the remote control. After the search is successful, a 16-bit value (Kfid_H, Kfid_L) will be returned. If no signal is received for more than 10 seconds, a failure will be returned.
 
 Command word: 0x81
 
 Device type: the type of remote control that needs to be matched
 
-Return: Success: 0x06,0x89,kfidH,kfidL,0x00,XOR
+Return: Success: 0x06,0x89,kfidH,kfidL,0x00,XOR  
+Failure: 0x06,0xE0,0xE1,0x00,0x00,0x07  
+Error code: 0xE1 The meaning is shown in Table 5
 
-Failure: 0x06,0xE0,0xE1,0x00,0x00,0x07 Error code: 0xE1 The meaning is shown in Table 5
-
-Note: One-key matching may not work well when there are duplicate codes (for example, a button of brand A and brand B have almost identical remote control codes). It is recommended to search by brand to match devices.
+Note: One-click matching may not work well when there are duplicate codes (for example, a button of brand A and brand B have almost identical remote control codes). It is recommended to search by brand to match devices.
 
 ### 3.3 Transmit Infrared Signal
 
@@ -201,15 +189,15 @@ Function: Transmit infrared control signal
 
 Command: 0x86
 
-Device type: remote control id
+Device type: remote control ID
 
-Button ID: Button id. For details, please refer to Table 6-Table 10.
+Button ID: Button ID. For details, please refer to Table 6-Table 10.
 
 Key value: key parameter value, please refer to Table 6-Table 10 for details. If there is no key value, fill in 0 directly.
 
-Return: Success: 0x06,0x89,0x00,0x00,0x00,0x8F
-
-Failure: 0x06,0xE0,0xE1,0x00,0x00,0x07 Error code: 0xE1 The meaning is shown in Table 5
+Return: Success: 0x06,0x89,0x00,0x00,0x00,0x8F  
+Failure: 0x06,0xE0,0xE1,0x00,0x00,0x07  
+Error code: 0xE1 The meaning is shown in Table 5
 
 ### 3.4 Infrared learning
 
@@ -217,21 +205,21 @@ Failure: 0x06,0xE0,0xE1,0x00,0x00,0x07 Error code: 0xE1 The meaning is shown in 
 | ------- | ----------- | --------------- | -------- | -------- | --------- |
 | 0x88    | 0x00/0x0C   | 0x##            | 0x00     | 0x00     | 0x##      |
 
-Function: Learn a string of infrared signals and save them to the location specified by the learning number. After the ZIGBEE infrared remote control receives the learning command, the indicator light flashes, prompting the user to press the remote control button.
+Function: Learn a string of infrared signals and save them to the location specified by the learning number. After the Zigbee infrared remote control receives the learning command, the indicator light flashes, prompting the user to press the remote control button.
 
 Command: 0x88
 
 Device type: The type of remote control that needs to be learned (only device type 0 or 12 has the learning function)
 
-Learning number: Learn and store the package number. After successful learning, the data saved by the original number will be overwritten, The value range is 1-32.
+Learning number: Learn and store the package number. After successful learning, the data saved by the original number will be overwritten. The value range is 1-32.
 
 Return: Success: 0x06,0x89,0x00,0x00,0x00,0x8F
 
-Failure: 0x06,0xE0,0xE1,0x00,0x00,0x07 Error code: 0xE1 The meaning is shown in Table 5
+Failure: 0x06,0xE0,0xE1,0x00,0x00,0x07 Error code: 0xE1. The meaning is shown in Table 5.
 
-Note: 1. There is no need to create a new remote control when using this command.
-
-? 2. If it is a matching remote control, please use one-key matching
+Note: 
+1. There is no need to create a new remote control when using this command.
+2. If it is a matching remote control, please use one-key matching.
 
 ### 3.5 Emitting infrared learning data
 
@@ -239,17 +227,18 @@ Note: 1. There is no need to create a new remote control when using this command
 | ------- | ----------- | --------------- | -------- | -------- | --------- |
 | 0x87    | 0x00/0x0C   | 0x##            | 0x00     | 0x00     | 0x##      |
 
-Function: Send the learned infrared signal (0x88 learned data)
+**Function**: Send the learned infrared signal (0x88 learned data)
+
 
 Command: 0x87
 
-Device type: Only device type 0 or 12 has learning function
+Device type: Only device type 0 or 12 has learning function.
 
-Learning number: Learning storage packet number, the number corresponding to the infrared data learned by the 0x88 command, The value range is 1-32.
+Learning number: Learning storage packet number, the number corresponding to the infrared data learned by the 0x88 command. The value range is 1-32.
 
 Return: Success: 0x06,0x89,0x00,0x00,0x00,0x8F
 
-Failure: 0x06,0xE0,0xE1,0x00,0x00,0x07 Error code: 0xE1 The meaning is shown in Table 5
+Failure: 0x06,0xE0,0xE1,0x00,0x00,0x07 Error code: 0xE1. The meaning is shown in Table 5.
 
 ### 3.6 Air conditioning status initialization
 
@@ -257,12 +246,11 @@ Failure: 0x06,0xE0,0xE1,0x00,0x00,0x07 Error code: 0xE1 The meaning is shown in 
 | ------- | ----------- | --------- | ------------ | -------- | --------- |
 | 0x8F    | 0x01        | 0x##      | 0x##         | 0x00     | 0x##      |
 
-Function: Change the air conditioner status recorded by the chip, create a new air conditioner remote control status as, open-24-cooling-automatic fan speed
+Function: Change the air conditioner status recorded by the chip, create a new air conditioner remote control status as: open-24-cooling-automatic fan speed.
 
-Order:
-0x8F
+Command: 0x8F
 
-Equipment type: Equipment remote control type (refer to Table 4), or use air conditioner 0x01
+Device type: Equipment remote control type (refer to Table 4), or use air conditioner 0x01.
 
 Button ID: Button ID. For details, please refer to Table 6-Table 10.
 
@@ -270,9 +258,7 @@ Key value: Key parameter value, please refer to Table 6-Table 10 for details.
 
 Return: Success: 0x06,0x89,0x00,0x00,0x00,0x8F
 
-Failure: 0x06,0xE0,0xE1,0x00,0x00,0x07 Error code: 0xE1 The meaning is shown in Table 5
-
-
+Failure: 0x06,0xE0,0xE1,0x00,0x00,0x07 Error code: 0xE1. The meaning is shown in Table 5.
 
 Note: This command has the same parameters as the infrared emission command, except that this command will not emit infrared signals, but only changes the internal state of the chip.
 
@@ -282,15 +268,15 @@ Note: This command has the same parameters as the infrared emission command, exc
 | ------- | -------- | -------- | -------- | -------- | --------- |
 | 0x82    | 0/1      | 0x00     | 0x00     | 0x00     | 0x##      |
 
-Function: Set air conditioner status feedback enable and disable
+Function: Set air conditioner status feedback enable and disable.
 
 Command: 0x82
 
-Feedback: 1=enabled 0=disabled
+Feedback: 1=enabled, 0=disabled.
 
 Return: Success: 0x06,0x89,0x00,0x00,0x00,0x8F
 
-Failure: 0x06,0xE0,0xE1,0x00,0x00,0x07 Error code: 0xE1, the meaning is shown in Table 5
+Failure: 0x06,0xE0,0xE1,0x00,0x00,0x07 Error code: 0xE1. The meaning is shown in Table 5.
 
 ### 3.8 Read ZIGBEE infrared remote control version
 
@@ -298,13 +284,13 @@ Failure: 0x06,0xE0,0xE1,0x00,0x00,0x07 Error code: 0xE1, the meaning is shown in
 | ------- | ------- | ------- | ------- | ------- | --------- |
 | 0x92    | 0x00    | 0x00    | 0x00    | 0x00    | 0x##      |
 
-Function: Read the version number of ZIGBEE infrared remote control
+Function: Read the version number of ZIGBEE infrared remote control.
 
 Command: 0x92
 
-Return: Success: 0x06,0x89,0x01,0x00,0x00,0x8E The third byte returned, 0x1, is the version number
+Return: Success: 0x06,0x89,0x01,0x00,0x00,0x8E. The third byte returned, 0x1, is the version number.
 
-Failure: 0x06,0xE0,0xE1,0x00,0x00,0x07 Error code: 0xE1 The meaning is shown in Table 5
+Failure: 0x06,0xE0,0xE1,0x00,0x00,0x07 Error code: 0xE1. The meaning is shown in Table 5.
 
 ### 3.9 Execution status return
 
@@ -312,15 +298,15 @@ Failure: 0x06,0xE0,0xE1,0x00,0x00,0x07 Error code: 0xE1 The meaning is shown in 
 | ------- | --------- | ------------ | -------- | -------- | --------- |
 | 0x06    | 0x89/0xE0 | 0x##         | 0x00     | 0x00     | 0x##      |
 
-Function: Return to execution status
+Function: Return to execution status.
 
 Command: 0x06
 
 Status: Success: 0x89 Failure: 0xE0
 
-Return value: When status = 0x89: the return value is the value that needs to be returned
-
-When status = 0xE0: the return value is an error code
+Return value: 
+- When status = 0x89: the return value is the value that needs to be returned.
+- When status = 0xE0: the return value is an error code.
 
 | **Error code** | **Error code meaning**                                       |
 | -------------- | ------------------------------------------------------------ |
@@ -341,57 +327,49 @@ When status = 0xE0: the return value is an error code
 
 Table 5
 
-### 3.10 Report air conditioning status parameter feedback
+### 3.10 Report Air Conditioning Status Parameter Feedback
 
-| Command | Switch | Mode | Temperature | Air volume | XOR check |
+| Command | Switch | Mode | Temperature | Air Volume | XOR Check |
 | ------- | ------ | ---- | ----------- | ---------- | --------- |
 | 0x08    | 0      | 1    | 1           | 0          | 0x##      |
 
-Function: When a valid air conditioner remote control signal is received (for example, the user presses the ordinary remote control to control the air conditioner), the air conditioner working status parameters will be fed back in real time. Since the infrared signal is a one-way signal, the air conditioner data controlled by the user pressing the air conditioner panel cannot be fed back.
+**Function**: When a valid air conditioner remote control signal is received (for example, when the user presses the power button on the remote control to control the air conditioner), the air conditioner working status parameters are fed back in real time. Since the infrared signal is one-way, the data from the air conditioner, when controlled directly via the air conditioner's panel, cannot be fed back.
 
-Command: 0x08
+**Command**: 0x08
 
-Switch: 0=ON, 1=OFF
+- **Switch**: 0 = ON, 1 = OFF
+- **Mode**: 0 = Auto, 1 = Cooling, 2 = Dehumidification, 3 = Air Supply, 4 = Heating
+- **Temperature**: 0 = 16℃, 1 = 17℃, …, 14 = 30℃
+- **Air Volume**: 0 = Automatic, 1 = Low Speed, 2 = Medium Speed, 3 = High Speed
 
-Mode: 0=auto, 1=cooling, 2=dehumidification, 3=air supply, 4=heating
+## 4 Infrared Access Flow Chart
 
-Temperature: 0=16℃, 1=17℃,… 14=30℃
+Note: If you need detailed command explanations, please refer to [6.1 Infrared Data Description].
 
-Air volume: 0=automatic, 1=low speed wind, 2=medium speed wind, 3=high speed wind
+### 4.1 Match by Brand
 
- 
-
-## 4 Infrared access flow chart
-
-Note: If you need detailed command explanation, please refer to [6.1 Infrared Data Description]
-
-### 4.1 Match by brand
-
-1. Open the "Infrared Brand Model Correspondence Table.xlsx" and find the device type that needs to be matched.
-2. Find the code table corresponding to the corresponding brand
-3. Use [3.1 New Remote Control] to create a new remote control
-4. Use [3.3 Transmit Infrared Signal] to send key data [Power On], and confirm that the device is powered on.
-5. Repeat step 4 1-2 times to test if other button functions are normal.
-6. The gateway/server saves the remote control kfid (corresponding remote control number), and the matching ends
-7. If it is an air conditioner, you also need to send [3.6 Air Conditioner Status Initialization] to initialize the air conditioner status.
+1. Find the corresponding device types in Table 11–Table 14.
+2. Find the code table corresponding to the relevant brand.
+3. Use [3.1 New Remote Control] to create a new remote control.
+4. Use [3.3 Transmit Infrared Signal] to send key data (e.g., [Power On]) and confirm that the device powers on.
+5. Repeat step 4 1–2 times to test if the other button functions are working correctly.
+6. The gateway/server saves the remote control kfid (the corresponding remote control number), and the matching process ends.
+7. If the device is an air conditioner, also send [3.6 Air Conditioner Status Initialization] to initialize the air conditioner status.
 
 ### 4.2 One-click matching
 
-1. Send [3.2 One-click matching] to enter matching mode
-2. The user presses the [Power] button on the remote control
-3. Parse the kfid in [3.9 Execution Status Return] and save it
-4. Use [3.1 New Remote Control] to create a new remote control
+1. Send [3.2 One-click matching] to enter matching mode.
+2. The user presses the [Power] button on the remote control.
+3. Parse the kfid in [3.9 Execution Status Return] and save it.
+4. Use [3.1 New Remote Control] to create a new remote control.
 5. If it is an air conditioner, you also need to send [3.6 Air Conditioner Status Initialization] to initialize the air conditioner status.
 
 ### 4.3 Infrared learning
 
-1. Use [3.4 infrared learning] to learn remote control data
-2. Use [3.5 Transmit infrared learning data] to send infrared data
+1. Use [3.4 infrared learning] to learn remote control data.
+2. Use [3.5 Transmit infrared learning data] to send infrared data.
 
 ## 5 Button ID and status ID
-
-### 5.1 Air conditioner button ID and status value
-
 
 | Button ID                                       | Button name          | Button status ID (starting from 0)                           |
 | ------------------------------------------- | -------------------- | ------------------------------------------------------ |
@@ -519,7 +497,7 @@ Table 8
 ### 5.4 TV box button ID
 | Button ID            | Button name   | Description          |
 | -------------------- | ------------- | ------------------------------------------------------------ |
-| 0x00                 | Power         |                                                              |
+| 0x00                 | Power on      |                                                              |
 | 0x01                 | Power off     | Generally, power off and power on have the same code, so the power on and off status cannot be accurately distinguished |
 | 0x02                 | Home Page     |                                                              |
 | 0x03                 | Menu          |                                                              |
@@ -591,62 +569,134 @@ Table 9
 
 Table 10
 
- 
+## 6 Infrared Remote Control Access Routine
 
-## 6 Infrared remote control access routine
+### 6.1 Infrared Data Description(Match by Brand)
 
-### 6.1 Infrared data description
-
-1. Newly built [Midea] air conditioner remote control: 80 01 00 28 00 A9
+1. Newly built [Midea] air conditioner remote control: `80 01 00 28 00 A9`
 
 | **Command** | **Description**                                              |
 | ----------- | ------------------------------------------------------------ |
 | **0x80**    | Command (create new remote control)                          |
 | **0x01**    | Device type, 0x01 means air conditioner                      |
 | **0x00**    | High 8 bits of Kfid                                          |
-| **0x28**    | Kfid low 8 bits                                              |
+| **0x28**    | Low 8 bits of Kfid                                              |
 | **0x00**    | Reserved bit, fixed to 0                                     |
-| **0xA9**    | Checksum (XOR sum calculation based on the previous data) Reference chapter [1.4.3 XOR check algorithm (XOR sum check)] |
+| **0xA9**    | Checksum (XOR sum calculation based on the previous data). Reference Chapter [1.4.3 XOR Check Algorithm (XOR Sum Check)] |
 
-Kfid acquisition: Find Table 11, search for [Midea], and learn that Midea's kfid range is decimal [40-59], converted to hexadecimal is [0x28-0x3B]
+**Kfid Acquisition**: Find Table 11, search for [Midea], and determine that Midea's kfid range is from decimal [40-59], which corresponds to hexadecimal [0x28-0x3B].
 
- 
+Note: The kfid of infrared remote control has multiple values, 40, 41, 42...59 are all Midea code values. In actual use, there may be situations where a certain button cannot be simulated and other buttons are normal, such as switches, temperature, or wind speed being normal, but the mode cannot be controlled. In such cases, you can change other code values for testing.
 
-Note: The kfid of infrared remote control has multiple values, 40, 41, 42...59 are all Midea code values. In actual use, there may be situations where a certain button cannot be simulated and other buttons are normal, such as switches, temperature , the wind speed is normal, but the mode cannot be controlled. At this time, you can change other code values for testing.
-
-2. Send boot command 86 01 00 00 00 87
+2. Send power on command `86 01 00 00 00 87`
 
 | **Command** | **Description**                                              |
 | ----------- | ------------------------------------------------------------ |
 | **0x86**    | Command (send infrared data)                                 |
-| **0x01**    | Device type, 0x01 means air conditioner                      |
-| **0x00**    | Remote control ID, air conditioner corresponding Table 6 |
-| **0x00**    | Key value, corresponding to air conditioner Table 6 |
+| **0x01**    | Device type, 0x01 means air conditioner (Table 4)            |
+| **0x00**    | Remote control ID, air conditioner corresponding Table 6     |
+| **0x00**    | Key value, corresponding to air conditioner Table 6          |
 | **0x00**    | Reserved bit, fixed to 0                                     |
 | **0x87**    | Checksum (XOR and calculation based on the previous data)    |
 
-3. Send shutdown command: 86 01 00 01 00 86
+3. Send power off command: `86 01 00 01 00 86`
 
 | **Command** | **Description**                                              |
 | ----------- | ------------------------------------------------------------ |
 | **0x86**    | Command (send infrared data)                                 |
-| **0x01**    | Device type, 0x01 means air conditioner                      |
-| **0x00**    | Remote control ID, air conditioner corresponding Table 6 |
-| **0x01**    | Key value, corresponding to air conditioner Table 6 |
+| **0x01**    | Device type, 0x01 means air conditioner (Table 4)            |
+| **0x00**    | Remote control ID, air conditioner corresponding Table 6     |
+| **0x01**    | Key value, corresponding to air conditioner Table 6          |
 | **0x00**    | Reserved bit, fixed to 0                                     |
 | **0x86**    | Checksum (XOR and calculation based on the previous data)    |
 
-4. Set the temperature to 25℃: 86 01 02 09 00 8C
+4. Set the temperature to 25℃: `86 01 02 09 00 8C`
 
 | **Command** | **Description**                                              |
 | ----------- | ------------------------------------------------------------ |
 | **0x86**    | Command (send infrared data)                                 |
-| **0x01**    | Device type, 0x01 means air conditioner                      |
-| **0x02**    | Remote control ID, air conditioner corresponding Table |
+| **0x01**    | Device type, 0x01 means air conditioner (Table 4)            |
+| **0x02**    | Remote control ID, air conditioner corresponding Table 6     |
 | **0x09**    | Key value, corresponding to air conditioner Table 6 (counting from 0, 25℃ corresponds to the 9th one) |
 | **0x00**    | Reserved bit, fixed to 0                                     |
 | **0x8C**    | Checksum (XOR and calculation based on the previous data)    |
 
+### 6.2 Infrared Data Description(One-click matching)
+
+**One-click matching is not the infrared learning (copying infrared signals) that everyone used before. Our remote control (ZB-IR01) is a remote control with a built-in infrared database. You can imagine it as a box with many remote controls in it. He will look in his infrared database for a remote control that best matches your remote control, then he will give you a number, and you will use the number to create the remote control.**
+
+
+1. Send the one-click matching command: `81 01 00 00 00 80`
+
+| **Command** | **Description**                                              |
+| ----------- | ------------------------------------------------------------ |
+| **0x81**    | Command (one-click matching command)                         |
+| **0x01**    | Device type, 0x01 means air conditioner (Table 4)            |
+| **0x00**    | Reserved bit, fixed to 0                                     |
+| **0x00**    | Reserved bit, fixed to 0                                     |
+| **0x00**    | Reserved bit, fixed to 0                                     |
+| **0x80**    | Checksum (XOR sum calculation based on the previous data). Reference Chapter [1.4.3 XOR Check Algorithm (XOR Sum Check)] |
+
+At this time you can see the green light on the infrared remote control flashing, you press the switch button of your original remote control, then you can receive the following command `06 89 00 28 00 A7`
+
+| **Command** | **Description**                                              |
+| ----------- | ------------------------------------------------------------ |
+| **0x06**    | Command (one-click matching command)                         |
+| **0x89**    | status Code (Table 5)                                        |
+| **0x00**    | High 8 bits of Kfid                                          |
+| **0x28**    | Low 8 bits of Kfid                                           |
+| **0x00**    | Reserved bit, fixed to 0                                     |
+| **0x80**    | Checksum (XOR sum calculation based on the previous data). Reference Chapter [1.4.3 XOR Check Algorithm (XOR Sum Check)] |
+
+Now that we have our kfid, let's build a new remote.
+
+
+
+2. New remote control: `80 01 00 28 00 A9`
+
+| **Command** | **Description**                                              |
+| ----------- | ------------------------------------------------------------ |
+| **0x80**    | Command (create new remote control)                          |
+| **0x01**    | Device type, 0x01 means air conditioner                      |
+| **0x00**    | High 8 bits of Kfid                                          |
+| **0x28**    | Low 8 bits of Kfid                                           |
+| **0x00**    | Reserved bit, fixed to 0                                     |
+| **0xA9**    | Checksum (XOR sum calculation based on the previous data). Reference Chapter [1.4.3 XOR Check Algorithm (XOR Sum Check)] |
+
+Next we can send commands to control our device.
+
+3. Send on command `86 01 00 00 00 87`
+
+| **Command** | **Description**                                              |
+| ----------- | ------------------------------------------------------------ |
+| **0x86**    | Command (send infrared data)                                 |
+| **0x01**    | Device type, 0x01 means air conditioner                      |
+| **0x00**    | Remote control ID, air conditioner corresponding Table 6     |
+| **0x00**    | Key value, corresponding to air conditioner Table 6          |
+| **0x00**    | Reserved bit, fixed to 0                                     |
+| **0x87**    | Checksum (XOR and calculation based on the previous data)    |
+
+4. Send off command: `86 01 00 01 00 86`
+
+| **Command** | **Description**                                              |
+| ----------- | ------------------------------------------------------------ |
+| **0x86**    | Command (send infrared data)                                 |
+| **0x01**    | Device type, 0x01 means air conditioner                      |
+| **0x00**    | Remote control ID, air conditioner corresponding Table 6     |
+| **0x01**    | Key value, corresponding to air conditioner Table 6          |
+| **0x00**    | Reserved bit, fixed to 0                                     |
+| **0x86**    | Checksum (XOR and calculation based on the previous data)    |
+
+4. Set the temperature to 25℃: `86 01 02 09 00 8C`
+
+| **Command** | **Description**                                              |
+| ----------- | ------------------------------------------------------------ |
+| **0x86**    | Command (send infrared data)                                 |
+| **0x01**    | Device type, 0x01 means air conditioner                      |
+| **0x02**    | Remote control ID, air conditioner corresponding Table 6     |
+| **0x09**    | Key value, corresponding to air conditioner Table 6 (counting from 0, 25℃ corresponds to the 9th one) |
+| **0x00**    | Reserved bit, fixed to 0                                     |
+| **0x8C**    | Checksum (XOR and calculation based on the previous data)    |
 
 ### Air conditioner brand code table (kfid)
 | 品牌(brand)                   | 代码(kfid code) | 品牌(brand)                         | 代码(kfid code) | 品牌(brand)          | 代码(kfid code) |
@@ -1041,20 +1091,48 @@ Table 14
 ## Exposes
 
 ### Last received command (text)
-Received infrared control command.
+Last received IR command code.
 Value can be found in the published state on the `last_received_command` property.
 It's not possible to read (`/get`) or write (`/set`) this value.
 
 ### Send command (text)
-Send infrared control command.
+Send infrared control command, This is a low-level interface. You can refer to the protocol documentation to implement more features..
 Value will **not** be published in the state.
 It's not possible to read (`/get`) this value.
 To write (`/set`) a value publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/set` with payload `{"send_command": NEW_VALUE}`.
 
-### Linkquality (numeric)
-Link quality (signal strength).
-Value can be found in the published state on the `linkquality` property.
-It's not possible to read (`/get`) or write (`/set`) this value.
-The minimal value is `0` and the maximum value is `255`.
-The unit of this value is `lqi`.
+### Ac kfid offset model (composite)
+Here you can create a new air conditioner remote control. First, select the brand of your air conditioner, then enter the remote control number within the indicated range in Ac kfid offset and click Apply. Finally, try turning on the air conditioner. If it fails, try the next number until it works..
+Can be set by publishing to `zigbee2mqtt/FRIENDLY_NAME/set` with payload `{"ac_kfid_offset_model": {"ac_brand": VALUE, "ac_kfid_offset": VALUE}}`
+- `ac_brand` (enum): AC brand - choose a brand first allowed values: `gree(格力)(0-19)`, `haier(海尔)(20-39)`, `midea(美的)(40-59)`, `changhong(长虹)(60-79)`, `chigo(志高)(80-99)`, `aux(奥克斯)(100-119)`, `tcl(TCL)(120-139)`, `hisense(海信)(140-159)`, `kelon(科龙)(160-179)`, `xiaomi(小米)(180-189)`, `hitachi(日立)(190-209)`, `natpanasonic(松下)(210-235)`, `toshiba(东芝)(236-245)`, `galanz(格兰仕)(246-259)`, `mitsubishiheavy(三菱重工)(260-279)`, `mitsubishielectric(三菱电机)(280-299)`, `samsung(三星)(300-319)`, `lg(LG)(320-329)`, `whirlpool(惠而浦)(330-339)`, `electrolux(伊莱克斯)(340-349)`, `konka(康佳)(350-359)`, `daikin(大金)(360-389)`, `sharp(夏普)(390-409)`, `trane(特灵)(410-419)`, `skyworth(创维)(420-429)`, `york(约克)(430-443)`, `fujitsu(富士通)(444-459)`, `shinco(新科)(460-469)`, `yangzi(扬子)(470-479)`, `mbo(美博)(480-489)`, `mcquay(麦克维尔)(490-499)`, `frestech(新飞)(500-506)`, `xiaoya(小鸭)(507-509)`, `tica(TICA)(510-515)`, `sast(先科)(516-519)`, `littleswan(小天鹅)(520-529)`, `sanyo(三洋)(530-559)`, `royalsta(荣事达)(560-565)`, `rca(RCA)(566-569)`, `lejn(乐京)(570-573)`, `rowa(乐华)(574-589)`, `casarte(卡萨帝)(590-595)`, `carrier(开利)(596-619)`, `giwee(积微)(620-622)`, `jensany(金三洋)(623-629)`, `hualing(华凌)(630-639)`, `gome(国美)(640-644)`, `gelin(歌林)(645-655)`, `chunlan(春兰)(656-666)`, `aoli(奥力)(667-669)`, `aucma(澳柯玛)(670-675)`, `shuanglu(双鹿)(676-679)`, `jiwu(苏宁极物)(680-683)`, `leader(统帅)(684-688)`, `tomsen(汤姆森)(689-693)`, `hyundai(现代)(694-699)`, `panda(熊猫)(700-704)`, `xyingyan(新迎燕)(705-709)`, `shenhua(申花)(710-712)`, `pascmio(中松)(713-714)`, `yuetu(月兔)(715-719)`, `fzm(方米)(720-721)`, `xft(雪菲特)(722-723)`, `boyin(波音)(724-725)`, `huabao(华宝)(726-729)`, `daewoo(大宇)(730-735)`, `conrowa(高路华)(736-739)`, `guqiao(古桥)(740-745)`, `huake(华科)(746-749)`, `huamei(华美)(750-754)`, `jinsong(金松)(755-759)`, `risuo(日索)(760-764)`, `shenbao(绅宝)(765-769)`, `wanbao(万宝)(770-774)`, `neitian(内田)(775-779)`, `electra(凉宇)(780-784)`, `bluestar(BlueStar)(785-789)`, `voltas(Voltas)(790-794)`, `akira(爱家乐)(795-799)`, `panlisen(Panlisen)(800-801)`, `rasonic(乐信)(802-809)`, `palcsicons(赢松)(810-811)`, `itan(盈田)(812-814)`, `whircipol(WhirciPol)(815-819)`, `changgu(长谷)(820-824)`, `funiki(Funiki)(825-829)`, `yiruite(亿瑞特)(830-834)`, `sanzuan(三钻)(835-839)`, `deroxi(德澳西)(840-844)`, `fedders(飞达仕)(845-849)`, `paonoca(韩亚)(850-854)`, `wuq(五强)(855-859)`, `sinro(新菱)(860-864)`, `insignia(影雅)(865-869)`, `elco(宜科)(870-874)`, `vicoo(VICOO)(875-879)`, `gmcc(GMCC)(880-884)`, `xinshiji(新世纪)(885-889)`, `bendao(本岛)(890-894)`, `sumsaxng(东方三星)(895-899)`, `jinxing(金兴)(900-904)`, `mitsein(弥特斯)(905-909)`, `ek(EK)(910-914)`, `kingair(国祥)(915-919)`, `aqua(AQUA)(920-924)`, `unionaire(Union aire)(925-929)`, `korechi(韩电)(930-939)`, `inventor(Inventor)(940-944)`, `xingfeidq(XINGFEIDQ)(945-949)`, `xffh(新飞飞鸿)(950-954)`, `dizhi(帝智)(955-959)`, `winia(WINIA)(960-964)`, `pascmio1(松电)(965-969)`, `chuangye(创野)(970-974)`, `shacopu(夏科普)(975-979)`, `panwosoci(正松川)(980-984)`, `shineleaf(夏立)(985-989)`, `panatomic(Panatomic)(990-994)`, `paonoca1(Paonoca)(995-999)`, `geling(歌菱)(1000-1004)`, `sharbo(夏宝)(1005-1009)`, `hangtiandianqi(航天电器)(1010-1014)`, `dongbao(东宝)(1015-1019)`, `toyo(东洋)(1020-1024)`, `shangling(上菱)(1025-1029)`, `teco(TECO)(1030-1034)`, `airwell(欧威尔)(1035-1039)`, `combine(康拜恩)(1040-1042)`, `feige(飞歌)(1043-1045)`, `partsoinc(Partsoinc)(1046-1049)`, `nikai(NiKai)(1050-1052)`, `mitsubishiheavy_haier(三菱重工海尔)(1053-1055)`, `voton(沃顿)(1056-1059)`, `tadiran(塔迪兰)(1060-1061)`, `lexin(乐新)(1062-1063)`, `nuolin(诺林)(1064-1066)`, `xiamenyilin(厦门亿林)(1067-1069)`, `horshron(虹声)(1070-1071)`, `levante(LEVANTE)(1072-1073)`, `guanyuan(冠远)(1074-1075)`, `lilytech(百合)(1076-1078)`, `sunny(阳光)(1079-1080)`, `viomi(云米)(1081-1082)`, `soyea(索伊)(1082-1085)`, `serene(西冷)(1086-1088)`, `cheblo(樱花电器)(1089-1094)`, `smartmi(智米)(1095-1099)`, `bosch(博世)(1100-1104)`, `partmusic(日松)(1105-1109)`, `funiki1(FUNIKI)(1110-1114)`, `hilaire(雪莱尔)(1115-1116)`, `hkc(惠科)(1117-1119)`, `bluestar1(Blue Star)(1120-1125)`, `teco1(东元)(1126-1128)`, `paohanic(松川)(1129-1131)`, `nintaus(金正)(1132-1136)`, `olimpiasplendid(欧菱宝)(1137-1139)`, `philips(飞利浦)(1140-1145)`, `fortress(丰泽)(1146-1147)`, `meilihongzuan(MEILIHONGZUAN)(1148-1149)`, `tica1(天加)(1150-1154)`, `junda(骏安达)(1155-1159)`, `electra1(以莱特)(1160-1162)`, `mingyi(名亿)(1163-1165)`, `ifb(IFB)(1166-1167)`, `kingsfin(Kingsfin)(1168-1169)`, `onida(Onida)(1170-1172)`, `suittc(鑫源)(1173-1175)`, `colmo(COLMO)(1176-1177)`, `duozuanhua(多钻花)(1178-1179)`, `huikang(惠康)(1180-1181)`, `gibson(吉普生)(1182-1189)`, `first(FIRST)(1190-1191)`, `jhs(金鸿盛)(1192-1193)`, `meiling(美菱)(1194-1197)`, `maxe(万士益)(1198-1201)`, `skg(SKG)(1202-1203)`, `acl(喜事来)(1204-1205)`, `tongyi(同益)(1206-1207)`, `tianyuan(天元)(1208-1209)`, `tianhui(天汇集成)(1210-1211)`, `tianjin(天津)(1212-1213)`, `tair(Tair)(1214-1215)`, `macro(万家乐)(1216-1219)`, `xinle(新乐)(1220-1223)`, `xinhuabao(新华宝)(1224-1225)`, `xiongdi(兄弟)(1226-1227)`, `benwin(宾维)(1228-1229)`, `sanshui(山水)(1230-1231)`, `phlgco(飞歌中国)(1232-1233)`, `linkcool(麟酷)(1234-1235)`, `nec(NEC)(1236-1238)`, `lanbo(蓝波)(1239-1249)`, `changling(长岭)(1250-1259)`, `jinli(金立)(1260-1261)`, `huifeng(汇丰)(1262-1265)`, `huanghe(黄河)(1266-1267)`, `hailin(海林)(1268-1269)`, `cih(CIH)(1270-1271)`, `meico(美歌)(1272-1273)`, `museen(慕森)(1274-1275)`, `millink(米林客)(1276-1277)`, `mistral(名氏风)(1278-1279)`, `mljd(麦勒)(1280-1281)`, `bole(波乐)(1282-1285)`, `sacon(帅康)(1286-1290)`, `weili(威力)(1291-1295)`, `sova(索华)(1296-1297)`, `zymbo(深宝)(1298-1299)`, `weiteli(威特利)(1300-1301)`, `kenwood(健伍)(1302-1304)`, `gee(弘立)(1305-1306)`, `hneyrea(虹立)(1307-1308)`, `langge(朗歌)(1309-1313)`, `oudian(欧典)(1314-1315)`, `pgtess(品格特斯)(1316-1317)`, `panwosoci1(Panwosoci)(1318-1319)`, `partsonic(深圳松下)(1320-1321)`, `twinswan(双凤)(1322-1323)`, `shengsong(深松)(1324-1325)`, `pamosautc(Pamosautc)(1326-1327)`, `caixing(彩星)(1328-1329)`, `cmv(CMV)(1330-1331)`, `dongxia(冬夏)(1332-1333)`, `guangda(光大)(1334-1335)`, `geyang(格阳)(1336-1337)`, `gchv(GCHV)(1338-1339)`, `huayi(华意)(1340-1342)`, `sunburg(森宝)(1343-1344)`, `boerka(波尔卡)(1345-1346)`, `aite(爱特)(1347-1348)`, `aidelong(艾德龙)(1349-1350)`, `dajinxing(大金星)(1351-1352)`, `dometic(多美达)(1353-1354)`, `museen1(慕森)(1274-1275)`
+- `ac_kfid_offset` (numeric): For example, if you select the first option, Gree, you can enter any number between 0 and 19, and then click Apply. 
+
+### Ac power (binary)
+AC power .
+Value can be found in the published state on the `ac_power` property.
+To read (`/get`) the value publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/get` with payload `{"ac_power": ""}`.
+To write (`/set`) a value publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/set` with payload `{"ac_power": NEW_VALUE}`.
+If value equals `on` ac power is ON, if `off` OFF.
+
+### Ac mode (enum)
+AC mode: auto/cooling/dehumidification/air_supply/heating.
+Value will **not** be published in the state.
+It's not possible to read (`/get`) this value.
+To write (`/set`) a value publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/set` with payload `{"ac_mode": NEW_VALUE}`.
+The possible values are: `auto`, `cooling`, `dehumidification`, `air_supply`, `heating`.
+
+### Ac temperature (numeric)
+AC temperature setting: 16-32°C.
+Value will **not** be published in the state.
+It's not possible to read (`/get`) this value.
+To write (`/set`) a value publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/set` with payload `{"ac_temperature": NEW_VALUE}`.
+The minimal value is `16` and the maximum value is `32`.
+The unit of this value is `°C`.
+
+### Ac wind speed (enum)
+AC fan speed.
+Value will **not** be published in the state.
+It's not possible to read (`/get`) this value.
+To write (`/set`) a value publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/set` with payload `{"ac_wind_speed": NEW_VALUE}`.
+The possible values are: `auto`, `low`, `medium`, `high`, `strong`.
 

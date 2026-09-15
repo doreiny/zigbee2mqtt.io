@@ -18,8 +18,9 @@ pageClass: device-page
 | Model | WXCJKG11LM  |
 | Vendor  | [Aqara](/supported-devices/#v=Aqara)  |
 | Description | Opple wireless switch (single band) |
-| Exposes | battery, voltage, operation_mode, action, linkquality |
+| Exposes | battery, voltage, operation_mode, action |
 | Picture | ![Aqara WXCJKG11LM](https://www.zigbee2mqtt.io/images/devices/WXCJKG11LM.png) |
+
 
 
 <!-- Notes BEGIN: You can edit here. Add "## Notes" headline if not already present. -->
@@ -41,12 +42,12 @@ As the device is sleeping by default, you need to wake it up after sending the b
 When endpoint `1` is bound to a light or a group of lights, the behavior is as follows (for a single band model):
 | Button | Click | Action | Comment |
 |-----|-----|-----|-----|
-| Left | Single  | Turn off | Using the `commandOff` command. |
-| Right  | Single  | Turn on | Using the `commandOn` command. |
-| Left | Double | Step down the brightness | In steps of 85 points (33%), using the `step` command. |
-| Right | Double | Step up the brightness | In steps of 85 points (33%), using the `step` command. |
-| Left | Long | Step the color temperature down | In steps of 69 mired using the `stepColorTemp` command.<br>I.e., make it warmer. |
-| Right | Long | Step the color temperature up | In steps of 69 mired using the `stepColorTemp` command.<br>I.e., make it colder. |
+| Left | Single  | Turn off | Using the `commandOff` command |
+| Right  | Single  | Turn on | Using the `commandOn` command |
+| Left | Double | Step down the brightness | In steps of 85 points (33%), using the `step` command |
+| Right | Double | Step up the brightness | In steps of 85 points (33%), using the `step` command |
+| Left | Long | Step the color temperature down | In steps of 69 mired using the `stepColorTemp` command (make it warmer) |
+| Right | Long | Step the color temperature up | In steps of 69 mired using the `stepColorTemp` command (make it colder) |
 
 ### Battery Replacement
 All devices in the Opple line share the same internal design. First, you will need to remove the wireless switch part from its mount.
@@ -85,11 +86,4 @@ Triggered action (e.g. a button click).
 Value can be found in the published state on the `action` property.
 It's not possible to read (`/get`) or write (`/set`) this value.
 The possible values are: `button_1_hold`, `button_1_release`, `button_1_single`, `button_1_double`, `button_1_triple`, `button_2_hold`, `button_2_release`, `button_2_single`, `button_2_double`, `button_2_triple`.
-
-### Linkquality (numeric)
-Link quality (signal strength).
-Value can be found in the published state on the `linkquality` property.
-It's not possible to read (`/get`) or write (`/set`) this value.
-The minimal value is `0` and the maximum value is `255`.
-The unit of this value is `lqi`.
 

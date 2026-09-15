@@ -1,12 +1,12 @@
 import {navbar} from './navbar';
 import {sidebar} from './sidebar';
 import * as path from 'path';
-import {PageOptions} from '@vuepress/core';
-import defaultTheme from '@vuepress/theme-default';
-import webpackBundler from '@vuepress/bundler-webpack';
-import * as DefinePlugin from 'webpack/lib/DefinePlugin.js';
+import {defaultTheme} from '@vuepress/theme-default';
+import viteBundler from '@vuepress/bundler-vite';
 import {googleAnalyticsPlugin} from '@vuepress/plugin-google-analytics';
 import {sitemapPlugin} from '@vuepress/plugin-sitemap';
+import {markdownHintPlugin} from '@vuepress/plugin-markdown-hint';
+import {redirectPlugin} from '@vuepress/plugin-redirect';
 import {docsearchPlugin} from '@vuepress/plugin-docsearch';
 import {registerComponentsPlugin} from '@vuepress/plugin-register-components';
 import {defineUserConfig} from 'vuepress';
@@ -109,6 +109,7 @@ const conf = defineUserConfig({
         repoLabel: 'GitHub (docs)',
         docsBranch: isDevelop ? 'develop' : 'master',
         editLinkText: 'Help to make the docu better and edit this page on Github ✌',
+        lastUpdatedText: 'Page was last updated on',
         logo: '/logo.png',
         docsDir: 'docs',
         navbar,
@@ -122,23 +123,31 @@ const conf = defineUserConfig({
 
     debug: false,
 
-    bundler: webpackBundler({
-        scss: {
-            sassOptions: {
-                // ignore sass deprecation errors
-                quietDeps: true,
+    bundler: viteBundler({
+        viteOptions: {
+            define: {
+                __QUASAR_VERSION__: '"dev"',
+                __QUASAR_SSR__: false,
+                __QUASAR_SSR_SERVER__: false,
+                __QUASAR_SSR_CLIENT__: false,
+                __QUASAR_SSR_PWA__: false,
             },
-        },
-        chainWebpack: (chain) => {
-            chain.plugin('define-quasar').use(DefinePlugin.default, [
-                {
-                    __QUASAR_VERSION__: `'dev'`,
-                    __QUASAR_SSR__: false,
-                    __QUASAR_SSR_SERVER__: false,
-                    __QUASAR_SSR_CLIENT__: false,
-                    __QUASAR_SSR_PWA__: false,
+            css: {
+                preprocessorOptions: {
+                    scss: {
+                        // ignore sass deprecation warnings from dependencies
+                        quietDeps: true,
+                    },
+                    sass: {
+                        // ignore sass deprecation warnings from dependencies
+                        quietDeps: true,
+                    },
                 },
-            ]);
+            },
+            build: {
+                // Keep memory usage lower by skipping minification during docs build.
+                minify: false,
+            },
         },
     }),
 
@@ -165,7 +174,7 @@ const conf = defineUserConfig({
         }),
         {
             name: 'extendsPageOptions',
-            extendsPageOptions: (pageOpts: PageOptions) => {
+            extendsPageOptions: (pageOpts) => {
                 pageOpts.frontmatter = pageOpts.frontmatter ?? {};
                 const frontmatter = pageOpts.frontmatter;
                 // Add content-page css class
@@ -174,11 +183,16 @@ const conf = defineUserConfig({
                 }
             },
         },
+        redirectPlugin(),
+        markdownHintPlugin({
+            // Enable gfm alert
+            alert: true,
+        }),
     ],
 });
 
 if (isDevelop) {
-    conf.head.push(['meta', {name: 'robots', content: 'noindex'}]);
+    conf.head!.push(['meta', {name: 'robots', content: 'noindex'}]);
 }
 
 export default conf;

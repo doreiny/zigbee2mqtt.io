@@ -18,8 +18,9 @@ pageClass: device-page
 | Model | QASZ24R  |
 | Vendor  | [QA](/supported-devices/#v=QA)  |
 | Description | mmWave 24 Ghz sensor with relay |
-| Exposes | presence, illuminance_lux, target_distance, radar_sensitivity, detection_range, shield_range, entry_sensitivity, entry_distance_indentation, entry_filter_time, departure_delay, block_time, breaker_status, breaker_mode, illuminance_threshold, status_indication, sensor, linkquality |
+| Exposes | presence, illuminance, target_distance, radar_sensitivity, detection_range, shield_range, entry_sensitivity, entry_distance_indentation, entry_filter_time, departure_delay, block_time, breaker_status, breaker_mode, illuminance_threshold, status_indication, sensor |
 | Picture | ![QA QASZ24R](https://www.zigbee2mqtt.io/images/devices/QASZ24R.png) |
+
 
 
 <!-- Notes BEGIN: You can edit here. Add "## Notes" headline if not already present. -->
@@ -32,7 +33,9 @@ pageClass: device-page
 ## Options
 *[How to use device type specific configuration](../guide/configuration/devices-groups.md#specific-device-options)*
 
-* `illuminance_lux_calibration`: Calibrates the illuminance_lux value (percentual offset), takes into effect on next report of device. The value must be a number.
+* `time_start`: Reply to Tuya-specific time synchronization requests: "1970" - Reply with seconds since 1970/01/01 (recommended, should stop the device from asking), "2000" - Reply with seconds since 2000/01/01 (use if the weekday is wrong with 1970), "off" - Don't reply (use if replying causes too much traffic). Default for this device: "off". The value must be one of `1970`, `2000`, `off`
+
+* `illuminance_calibration`: Calibrates the illuminance value (percentual offset), takes into effect on next report of device. The value must be a number.
 
 
 ## Exposes
@@ -43,9 +46,9 @@ Value can be found in the published state on the `presence` property.
 It's not possible to read (`/get`) or write (`/set`) this value.
 If value equals `true` presence is ON, if `false` OFF.
 
-### Illuminance (lux) (numeric)
-Measured illuminance in lux.
-Value can be found in the published state on the `illuminance_lux` property.
+### Illuminance (numeric)
+Measured illuminance.
+Value can be found in the published state on the `illuminance` property.
 It's not possible to read (`/get`) or write (`/set`) this value.
 The unit of this value is `lx`.
 
@@ -86,7 +89,7 @@ To write (`/set`) a value publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/
 The minimal value is `0` and the maximum value is `9`.
 
 ### Entry distance indentation (numeric)
-Indent the distance inward based on the dectection distance.
+Indent the distance inward based on the detection distance.
 Value can be found in the published state on the `entry_distance_indentation` property.
 It's not possible to read (`/get`) this value.
 To write (`/set`) a value publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/set` with payload `{"entry_distance_indentation": NEW_VALUE}`.
@@ -152,11 +155,4 @@ Value can be found in the published state on the `sensor` property.
 It's not possible to read (`/get`) this value.
 To write (`/set`) a value publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/set` with payload `{"sensor": NEW_VALUE}`.
 The possible values are: `on`, `off`, `occupied`, `unoccupied`.
-
-### Linkquality (numeric)
-Link quality (signal strength).
-Value can be found in the published state on the `linkquality` property.
-It's not possible to read (`/get`) or write (`/set`) this value.
-The minimal value is `0` and the maximum value is `255`.
-The unit of this value is `lqi`.
 

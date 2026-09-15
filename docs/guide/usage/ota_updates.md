@@ -1,120 +1,196 @@
 ---
+redirectFrom: /information/ota_updates.md
 ---
 
 # OTA updates
 
-> An ongoing discussion about this feature can be found in [#2921](https://github.com/Koenkk/zigbee2mqtt/issues/2921)
+This feature allows updating the firmware of Zigbee devices over-the-air.
 
-This feature allows to update your Zigbee devices over-the-air.
+> [!WARNING]
+> Firmware updates can provide bug fixes, security updates and other welcomed features.
+> However, they can also change device behavior in ways that may affect Zigbee2MQTT compatibility and potentially introduce buggy, or even malicious functionality.
+> **Review the release notes before applying a firmware update.**
 
-::: tip TIP
-Always check if the firmware update will bring you advantages. Firmware updates are NOT made for Zigbee2MQTT, but for working with apps and hubs from the brand.
-In some cases the firmware update can cause that your device will react different then Zigbee2MQTT expects, making that you can't use it the way you want, at least until Zigbee2MQTT is changed to react to those changes.
-If you get annoyed by the notifications that there are updates available, then turn the automatic check off.
-:::
+By default, Zigbee2MQTT matches and retrieves OTA images from the [Koenkk/zigbee-OTA](https://github.com/Koenkk/zigbee-OTA) repository (if it has internet access).
+This repository is a mirror of manufacturer-provided firmware updates, both manually and automatically curated.
+[Using custom/local sources](#using-custom-firmware-files-or-index) is explained further down the page.
 
-Not all manufacturers make their updates available, below is a (not-complete) list of manufacturer/devices that support it:
+> [!TIP]
+> Most actions and configurations on this page can be done via the frontend.
 
--   IKEA TRÅDFRI devices
--   Ubisys devices
--   Some Xiaomi devices
--   Salus SP600 Smart plug
--   Osram/Ledvance devices (not every firmware is made available by them, in case not you will see the following exception in the log `No image available for ...`)
--   Philips Hue devices (not every firmware is made available by them, in case not you will see the following exception in the log `No image available for ...`)
--   Jung ZLLxx5004M, Jung ZLLHS4 and Gira 2435-10
-    Gira does unfortunately not seem to offer firmware updates for their wall transmitter 2430-100 (which is very similar to the Jung ZLLxx5004M) and the update file for the Jung wall transmitter does not work for Gira (probably because the Gira wall transmitter only has 6 buttons instead of 8 on the Jung).
--   Sengled devices
+## Update status
 
-To check whether your specific device supports OTA updates via Zigbee2MQTT, go to the supported devices page, click on your device and look for the _OTA updates_ section.
-
-## Automatic checking for available updates
-
-Your zigbee devices can request a firmware update check. Zigbee2MQTT obliges this, and will automatically check if updates are available for your devices.
-
-The update state will be published to `zigbee2mqtt/[DEVICE_FRIENDLY_NAME]`, example payload: `{"update": {"state": "available"}}`.
+The update state is published to `zigbee2mqtt/[DEVICE_FRIENDLY_NAME]`, example payload: `{"update":{"state":"available"}}`.
 The possible states are:
 
--   `available`: an update is available for this device
--   `updating`: update is in progress. During this the progress in % and remaining time in seconds is also added to the payload, example: `{"update": {"state": "updating","progress":13.37,"remaining": 219}}`.
--   `idle`: no update available/in progress
+- `idle`: No update available/in progress
+- `available`: An update is available for this device
+- `scheduled`: An update may start on the next update check requested by the device
+- `updating`: An update is in progress
+    - During this the progress in % and remaining time in seconds is also added to the payload (reported every 30sec), example: `{"update":{"state":"updating","progress":13.37,"remaining":219}}`
+    - The first progress report (at 0%) gives an estimated remaining time based on the OTA settings. The actual remaining time will adjust with each progress report based on the current state (greatly affected by the network)
 
-To protect privacy it is possible to limit how often third party servers may be contacted. You can set the minimum time that should pass between two firmware update checks, in minutes. The default is 1440 minutes (1 day). Here it is set to check at most every two days:
+## Checking for updates
+
+### Automatic checking
+
+Zigbee devices supporting OTA can periodically request a firmware update check. Upon reception of such a request, Zigbee2MQTT will check for updates (on the default source) and publish the result to MQTT.
+
+Some devices request updates too often. Zigbee2MQTT limits the checks to once per day (1440 min). The **update check interval** is configurable, but it does not prevent a device from requesting. Zigbee2MQTT will just ignore these messages if within that interval.  
+Here it is set to check at most once every two days, in `configuration.yaml`:
 
 ```yaml
 ota:
     update_check_interval: 2880
 ```
 
-It is also possible to completely ignore these device-initiated requests for updates checks by modifying the configuration.yaml file. In the example below, only manual firmware update checks will be possible:
+It is also possible to completely **ignore the update checks** initiated by devices (Zigbee2MQTT will always reply "no image available"). If `configuration.yaml` is modified like this, only manual checks will proceed:
 
 ```yaml
 ota:
     disable_automatic_update_check: true
 ```
 
-_NOTE: there is also a property `update_available` which is deprecated_.
+This is also available per-device. See [Device options](../configuration/devices-groups.md).
 
-## Manually check if an update is available
+Disabling automatic update checks does not prevent [scheduled OTA](#scheduling-update-on-next-device-request).
 
-To check if an update is available for your device send a message to `zigbee2mqtt/bridge/request/device/ota_update/check` with payload `{"id": "deviceID"}` or `deviceID` where deviceID can be the `ieee_address` or `friendly_name` of the device. Example; request: `{"id": "my_remote"}` or `my_remote`, response: `{"data":{"id": "my_remote","updateAvailable":true},"status":"ok"}`. For battery powered end-devices you may need to trigger them by e.g. pushing a button right before checking for an OTA.
+### Manual checking
 
-## Update to latest firmware
+To manually check for **upgrade**, send a message to `zigbee2mqtt/bridge/request/device/ota_update/check` with payload `{"id":"deviceID"}` where deviceID can be the `ieee_address` or `friendly_name` of the device.  
+To check if a **downgrade** is available, send the message to `zigbee2mqtt/bridge/request/device/ota_update/check/downgrade` instead.
 
-Once an update is available you can update it by sending to `zigbee2mqtt/bridge/request/device/ota_update/update` with payload `{"id": "deviceID"}` or `deviceID` where deviceID can be the `ieee_address` or `friendly_name` of the device, example request: `{"id": "my_remote"}` or `my_remote`. Once the update is completed a response is send, example response: `{"data":{"id": "my_remote","from":{"software_build_id":1,"date_code":"20190101"},"to":{"software_build_id":2,"date_code":"20190102"}},"status":"ok"}`.
+Zigbee2MQTT will request the current firmware information from the device (manufacturer code, image type and installed version). Only after reception, it will look up the OTA index.
+If the device does not respond, wake it up (e.g. push a button) right before checking, or wait for the automatic check.
 
-An update typically takes +- 10 minutes. While a device is updating a lot of traffic is generated on the network, therefore it is not recommend to execute multiple updates at the same time.
+Example request: `{"id":"my_remote"}`, response: `{"data":{"id":"my_remote","update_available":false},"status":"ok"}`.
 
-## Using the IKEA TRADFRI test server
+If an update is available (`"update_available":true`), the response will also contain:
 
-If IKEA TRADFRI devices are rejecting OTA updates, it is possible the OTA server is providing a corrupt file. The firmwares published on the IKEA **test** server can be used. In most cases, this is not needed and will result in slower / no OTA updates as the test server is not kept up to date. You can instruct Zigbee2MQTT to use the test server by adding the following to your `configuration.yaml`.
+- `source`: the URL or file path to the OTA file
+- `release_notes`: (if provided) the release notes for the source
+- `downgrade`: true if the availability is for a downgrade
 
-**WARNING: Use at your own risk!**
+## Starting an update
+
+> [!WARNING]
+> The update process greatly varies in duration: 10-100 minutes depending on device, settings and network stability. The device is usable during this time, but heavy traffic is added on the network. Therefore, the best practice is to **update one device at a time, while the network is in low demand.**
+>
+> When uploading the OTA file completes, the device will reboot with the new firmware. **The reboot may cause unwanted interruptions or turn-ons, due to power-on behavior (e.g. light-up in the middle of the night)!**
+>
+> Since updating can drastically change the device behavior, Zigbee2MQTT treats it similarly to pairing a new device. It will automatically re-interview to detect new capabilities and **re-configure to ensure normal operation (this may overwrite custom reporting intervals with the default values)**
+
+### Manual update request
+
+When an **upgrade** is available, start it by sending a message to `zigbee2mqtt/bridge/request/device/ota_update/update` with payload `{"id":"deviceID"}` where deviceID can be the `ieee_address` or `friendly_name` of the device.
+When a **downgrade** is available, start it by sending the message to `zigbee2mqtt/bridge/request/device/ota_update/update/downgrade` instead.
+You can abort a running update by sending a message to `zigbee2mqtt/bridge/request/device/ota_update/update/abort` with payload `{"id":"deviceID"}` (same as above).
+
+If the device does not respond, wake it up (e.g. push a button) right before starting, or [schedule](#scheduling-update-on-next-device-request) the update.  
+The progress is published to the respective device topic, as described [above](#device-state).
+
+Once the update is completed, a response is sent, example response: `{"data":{"id":"my_remote","from":{"file_version":5,"software_build_id":1,"date_code":"20190101"},"to":{"file_version":10,"software_build_id":2,"date_code":"20190102"}},"status":"ok"}`.  
+Note that `software_build_id` and `date_code` are **optional** device attributes, some devices may have them, others not (even same model can differ, since this is firmware-dependent).
+
+### Scheduling update on next device request
+
+It's possible to schedule the update for the next time the device requests an OTA update check.
+
+> [!TIP]
+> This can help for battery-powered devices that usually don't respond to [manual update requests](#manual-update-request) unless physically woken up right before triggering. Some brands/models are known to only update this way (e.g. some Legrand devices).
+
+To schedule, send a message to `zigbee2mqtt/bridge/request/device/ota_update/schedule` with payload `{"id":"deviceID"}` where deviceID can be the `ieee_address` or `friendly_name` of the device, example request: `{"id":"my_remote"}`.  
+The same applies for downgrade with topic `zigbee2mqtt/bridge/request/device/ota_update/schedule/downgrade`.
+
+To unschedule, send the same payload, but with the topic `zigbee2mqtt/bridge/request/device/ota_update/unschedule`.
+
+Scheduling status is saved in the database, and restored after Zigbee2MQTT restarts.
+
+If a scheduled update fails, it will remain scheduled (Device will try again, on the next check).  
+If there is no update available when the device requests, the schedule is removed.  
+A [manual update request](#manual-update-request) will remove the existing schedule, only if the update succeeds.
+
+## Downgrading
+
+Downgrading the firmware is also possible. Follow the same updating steps, but use the respective `downgrade` topics, as described above.
+
+The default source ([Koenkk/zigbee-OTA](https://github.com/Koenkk/zigbee-OTA)) usually stores the latest and latest-1 images. This allows for one version downgrade. Otherwise, the older firmware must be provided by the user as a [custom source](#using-custom-firmware-files-or-index).
+
+Even though Zigbee specification allows firmware downgrading, some devices may reject older firmware versions. Additionally, updating to a firmware of same version is not supported by Zigbee specification. This cannot be forced by Zigbee2MQTT.
+
+Backing-up the currently installed version is not possible.
+
+## Advanced configuration
+
+### Change update parameters
+
+The following OTA settings can be adjusted globally (by editing `configuration.yaml`) or per request (by providing them in the payload): `image_block_request_timeout`, `image_block_response_delay`, `default_maximum_data_size`.
 
 ```yaml
 ota:
-    ikea_ota_use_test_url: true
+    image_block_request_timeout: 150000
+    image_block_response_delay: 250
+    default_maximum_data_size: 50
 ```
 
-## Local OTA index and firmware files
+Increasing the **timeout for reception of chunk requests** from the device can help if a device is unusually slow at this. The default is however already 150000ms and should fit most cases.
 
-OTA Index file is a list of firmware images available on a particular server. When checking if an update is available, Zigbee2MQTT determines current hardware and firmware version for a particular device, and then searches for a suitable upgrade image in the index file. Some vendors (such as IKEA Tradfri, Ledvance, Salus, Ubisys) use their proprietary index files, but the most of the devices use [Zigbee-OTA](https://github.com/Koenkk/zigbee-OTA) firmware repository with a [main index file](https://github.com/Koenkk/zigbee-OTA/blob/master/index.json).
+The **minimum delay between two chunks** can be decreased for faster OTA updates, but it may require a far more stable network to avoid issues and crashes. The default is 250ms and the minimum is 50ms.
 
-Sometimes it is necessary to add a firmware image that is not on the main index. This could be helpful when developing a DIY device, or install a test/alternate image for a mass-produced device. In this case user can supply Zigbee2MQTT with an alternate index file, located locally or on a web server. This index file will point Zigbee2MQTT to the firmware image files. Records in the override OTA index file will override corresponding records in the main index, so that it is possible to alter the image for a particular device type.
+The **size of image chunks** sent by Zigbee2MQTT is by default limited to 50 bytes. Similarly, bigger chunks will increase the OTA speed, but reduce network stability. Minimum is 10B and maximum is 100B.  
+Some devices will refuse higher sizes than 50/64 bytes.  
+Zigbee2MQTT will ignore the custom value for some devices and automatically use the correct size that they expect.
+
+### Using custom firmware files or index
+
+Devices can be updated from custom sources, by supplying the firmware files directly, or by listing them in a custom index.
+
+> [!CAUTION]
+> Improper use of custom OTA index or firmware files can brick devices. Due to the nature of "custom firmware", several of the regular OTA constraints are bypassed in this mode. **Use trusted sources!**
+
+An OTA index file is a list of firmware images available in designated locations. By default, Zigbee2MQTT uses the [upgrade index file](https://github.com/Koenkk/zigbee-OTA/blob/master/index.json), and the [downgrade index file](https://github.com/Koenkk/zigbee-OTA/blob/master/index1.json) from the [zigbee-OTA](https://github.com/Koenkk/zigbee-OTA) repository.
+
+A custom update index can be supplied globally (by editing `configuration.yaml`) or per update request. Accepted formats are: local file path (absolute or relative) and web URL.
+
+The override OTA index file shall have the same structure as the [zigbee-OTA index file](https://github.com/Koenkk/zigbee-OTA/blob/master/index.json).
+See the [repository README](https://github.com/Koenkk/zigbee-OTA/tree/master?tab=readme-ov-file#notes-for-maintainers--developers) if an image requires extra metadata.
+
+> [!TIP]
+> The following tool can generate indexes and do more helpful operations: [https://nerivec.github.io/zigbee-ota-file-editor/](https://nerivec.github.io/zigbee-ota-file-editor/)
+
+If the default Zigbee2MQTT index is inaccessible (e.g. air gapped network), only the local OTA index will be used.  
+If both indexes are available, records in the override index will take precedence over the ones in the default index.
+
+#### Global index override
+
+In this example, `my_index.json` is located in the same directory as `configuration.yaml`:
 
 ```yaml
 ota:
     zigbee_ota_override_index_location: my_index.json
+    # or
+    zigbee_ota_override_index_location: https://example.com/ota/index.json
 ```
 
-Local index file is searched in the configuration directory (next to `configuration.yaml`). The file name could be also a full path to the file, taking into account that host file system may not be available when running Zigbee2MQTT inside a docker container. Alternatively, Zigbee2MQTT supports index files located on a remote HTTP(s) server. In this case `zigbee_ota_override_index_location` key should be an URL of the index file.
+#### Per request custom index / firmware
 
-The override OTA index file shall have the same structure as the [main index file](https://github.com/Koenkk/zigbee-OTA/blob/master/index.json). To create the index file it is possible to use [add.js](https://github.com/Koenkk/zigbee-OTA/blob/master/scripts/add.js) script (follow instructions [here](https://github.com/Koenkk/zigbee-OTA)). Correct image location and image URL as necessary.
+The following topics support supplying `url` in the payload (also accepting local paths and web URLs) to update with custom files.
 
-Firmware files can be located either on a web server, or on the local file system. In this case `url` field in the index file entry shall be either a full path to the image file, or relative to the Zigbee2MQTT configuration directory. In case of local image file, index entry can be simplified to only 'url' field. Other fields are still allowed, but if omitted corresponding information (firmware version, image type, manufacturer ID, etc) is read from the image file.
+If the pointed location is a JSON file (`*.json`), it will be treated as an index, else as a firmware file.
 
-```json
-[
-    {
-        "url": "HelloZigbee.ota"
-    }
-]
-```
+- Only index supported
+    - `bridge/request/device/ota_update/check`
+    - `bridge/request/device/ota_update/check/downgrade`
+- Index, firmware file and hex data supported
+    - `bridge/request/device/ota_update/update`
+    - `bridge/request/device/ota_update/update/downgrade`
+    - `bridge/request/device/ota_update/schedule`
+    - `bridge/request/device/ota_update/schedule/downgrade`
 
-Normally Zigbee2MQTT compares current device firmware with available images version, and allows flashing only firmwares with `fileVersion` that is higher than current. To force Zigbee2MQTT to use arbitrary version a `force` field can be used:
-
-```json
-[
-    {
-        "url": "HelloZigbee.ota",
-        "force": true
-    }
-]
-```
-
-Please note, even though Zigbee specification basically allows firmware version downgrade, some of the devices may reject older firmwares. This cannot be forced from Zigbee2MQTT side.
+The full OTA file can also be supplied in hex string form: `"hex":{"data":"1EF1EEB0...","file_name":"my-file.ota"}`. The firmware file will be stored in `data/ota/` upon receipt. This is mainly intended for frontend use (where this payload is built from a "file upload" dialog).
 
 ## Troubleshooting
 
--   `Device didn't respond to OTA request` or `Update failed with reason: 'aborted by device'`: try restarting the device by disconnecting the power/battery for a few seconds and try again, make sure to activate the device by pressing a button on it right before sending the update request.
--   For battery powered devices make sure that the battery is 70%+ as OTA updating is very power consuming. Some devices check for a minimum battery level prior to updating and refuse to update.
--   Make sure your log level is set to "info" - when set to warning - the UI will not report the correct info.
+- `Device didn't respond to OTA request` or `Update failed with reason: 'aborted by device'`: try restarting the device by disconnecting the power/battery for a few seconds, then try OTA again, make sure to activate the device by pressing a button on it right before sending the update request
+- For battery powered devices make sure that the battery is 70%+ as OTA updating is very power consuming. Some devices check for a minimum battery level prior to updating and will refuse to update if too low
+- Make sure your log level is set to `info`. When set to `warning` or `error`, frontend will not report some messages indicating the current OTA status

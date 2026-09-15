@@ -18,8 +18,9 @@ pageClass: device-page
 | Model | PECLS01  |
 | Vendor  | [Perenio](/supported-devices/#v=Perenio)  |
 | Description | Flood alarm device |
-| Exposes | water_leak, battery_low, tamper, battery, linkquality |
+| Exposes | water_leak, battery_low, tamper, battery |
 | Picture | ![Perenio PECLS01](https://www.zigbee2mqtt.io/images/devices/PECLS01.png) |
+
 
 
 <!-- Notes BEGIN: You can edit here. Add "## Notes" headline if not already present. -->
@@ -59,11 +60,4 @@ Value can be found in the published state on the `battery` property.
 It's not possible to read (`/get`) or write (`/set`) this value.
 The minimal value is `0` and the maximum value is `100`.
 The unit of this value is `%`.
-
-### Linkquality (numeric)
-Link quality (signal strength).
-Value can be found in the published state on the `linkquality` property.
-It's not possible to read (`/get`) or write (`/set`) this value.
-The minimal value is `0` and the maximum value is `255`.
-The unit of this value is `lqi`.
 

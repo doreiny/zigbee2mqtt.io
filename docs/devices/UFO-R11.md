@@ -18,8 +18,9 @@ pageClass: device-page
 | Model | UFO-R11  |
 | Vendor  | [Moes](/supported-devices/#v=Moes)  |
 | Description | Universal smart IR remote control |
-| Exposes | learn_ir_code, learned_ir_code, ir_code_to_send, linkquality, battery, voltage |
+| Exposes | learn_ir_code, learned_ir_code, learned_ir_timings, ir_code_to_send, ir_emitter, battery, voltage |
 | Picture | ![Moes UFO-R11](https://www.zigbee2mqtt.io/images/devices/UFO-R11.png) |
+
 
 
 <!-- Notes BEGIN: You can edit here. Add "## Notes" headline if not already present. -->
@@ -50,6 +51,9 @@ Request:
     "ir_code_to_send": "<previously learned IR code>"
 }
 ```
+
+### Pairing
+Open the back and press the reset button until the LED on the front start blinking.
 <!-- Notes END: Do not edit below this line -->
 
 
@@ -69,18 +73,22 @@ The IR code learned by device.
 Value can be found in the published state on the `learned_ir_code` property.
 It's not possible to read (`/get`) or write (`/set`) this value.
 
+### Learned ir timings (text)
+The IR timings learned by device.
+Value can be found in the published state on the `learned_ir_timings` property.
+It's not possible to read (`/get`) or write (`/set`) this value.
+
 ### Ir code to send (text)
-The IR code to send by device.
+The IR code or timings to send by device.
 Value will **not** be published in the state.
 It's not possible to read (`/get`) this value.
 To write (`/set`) a value publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/set` with payload `{"ir_code_to_send": NEW_VALUE}`.
 
-### Linkquality (numeric)
-Link quality (signal strength).
-Value can be found in the published state on the `linkquality` property.
-It's not possible to read (`/get`) or write (`/set`) this value.
-The minimal value is `0` and the maximum value is `255`.
-The unit of this value is `lqi`.
+### Ir emitter (text)
+The IR code or timings to send by device.
+Value will **not** be published in the state.
+It's not possible to read (`/get`) this value.
+To write (`/set`) a value publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/set` with payload `{"ir_emitter": NEW_VALUE}`.
 
 ### Battery (numeric)
 Remaining battery in %, can take up to 24 hours before reported.

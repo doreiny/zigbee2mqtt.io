@@ -1,6 +1,6 @@
 ---
-title: "Neo NAS-AB06B2 control via MQTT"
-description: "Integrate your Neo NAS-AB06B2 via Zigbee2MQTT with whatever smart home infrastructure you are using without the vendor's bridge or gateway."
+title: "NEO NAS-AB06B2 control via MQTT"
+description: "Integrate your NEO NAS-AB06B2 via Zigbee2MQTT with whatever smart home infrastructure you are using without the vendor's bridge or gateway."
 addedAt: 2023-06-27T19:46:17
 pageClass: device-page
 ---
@@ -11,15 +11,16 @@ pageClass: device-page
 <!-- Do not use h1 or h2 heading within "## Notes"-Section. -->
 <!-- !!!! -->
 
-# Neo NAS-AB06B2
+# NEO NAS-AB06B2
 
 |     |     |
 |-----|-----|
 | Model | NAS-AB06B2  |
-| Vendor  | [Neo](/supported-devices/#v=Neo)  |
+| Vendor  | [NEO](/supported-devices/#v=NEO)  |
 | Description | Outdoor solar alarm |
-| Exposes | alarm_state, alarm_switch, tamper_alarm_switch, tamper_alarm, alarm_melody, alarm_mode, alarm_time, charging, battery, linkquality |
-| Picture | ![Neo NAS-AB06B2](https://www.zigbee2mqtt.io/images/devices/NAS-AB06B2.png) |
+| Exposes | alarm_state, alarm_switch, tamper_alarm_switch, tamper_alarm, alarm_melody, alarm_mode, alarm_time, charging, battery |
+| Picture | ![NEO NAS-AB06B2](https://www.zigbee2mqtt.io/images/devices/NAS-AB06B2.png) |
+
 
 
 <!-- Notes BEGIN: You can edit here. Add "## Notes" headline if not already present. -->
@@ -28,6 +29,11 @@ pageClass: device-page
 <!-- Notes END: Do not edit below this line -->
 
 
+
+## Options
+*[How to use device type specific configuration](../guide/configuration/devices-groups.md#specific-device-options)*
+
+* `time_start`: Reply to Tuya-specific time synchronization requests: "1970" - Reply with seconds since 1970/01/01 (recommended, should stop the device from asking), "2000" - Reply with seconds since 2000/01/01 (use if the weekday is wrong with 1970), "off" - Don't reply (use if replying causes too much traffic). Default for this device: "off". The value must be one of `1970`, `2000`, `off`
 
 
 ## Exposes
@@ -92,11 +98,4 @@ Value can be found in the published state on the `battery` property.
 It's not possible to read (`/get`) or write (`/set`) this value.
 The minimal value is `0` and the maximum value is `100`.
 The unit of this value is `%`.
-
-### Linkquality (numeric)
-Link quality (signal strength).
-Value can be found in the published state on the `linkquality` property.
-It's not possible to read (`/get`) or write (`/set`) this value.
-The minimal value is `0` and the maximum value is `255`.
-The unit of this value is `lqi`.
 

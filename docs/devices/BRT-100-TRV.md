@@ -18,8 +18,9 @@ pageClass: device-page
 | Model | BRT-100-TRV  |
 | Vendor  | [Moes](/supported-devices/#v=Moes)  |
 | Description | Thermostatic radiator valve |
-| Exposes | battery, lock (state), eco_mode, eco_temperature, max_temperature, min_temperature, valve_state, position, switch (state), window, climate (local_temperature, current_heating_setpoint, local_temperature_calibration, system_mode, running_state, preset), programming_mode, boost_heating, boost_heating_countdown, boost_heating_countdown_time_set, linkquality |
+| Exposes | battery, child_lock, eco_mode, eco_temperature, max_temperature, min_temperature, valve_state, position, switch (state), window, climate (local_temperature, current_heating_setpoint, local_temperature_calibration, system_mode, running_state, preset), programming_mode, boost_heating, boost_heating_countdown, boost_heating_countdown_time_set |
 | Picture | ![Moes BRT-100-TRV](https://www.zigbee2mqtt.io/images/devices/BRT-100-TRV.png) |
+
 
 
 <!-- Notes BEGIN: You can edit here. Add "## Notes" headline if not already present. -->
@@ -43,6 +44,11 @@ In this situation a firmware update made the device unable to connect to the Zig
 
 
 
+## Options
+*[How to use device type specific configuration](../guide/configuration/devices-groups.md#specific-device-options)*
+
+* `time_start`: Reply to Tuya-specific time synchronization requests: "1970" - Reply with seconds since 1970/01/01 (recommended, should stop the device from asking), "2000" - Reply with seconds since 2000/01/01 (use if the weekday is wrong with 1970), "off" - Don't reply (use if replying causes too much traffic). Default for this device: "1970". The value must be one of `1970`, `2000`, `off`
+
 
 ## Exposes
 
@@ -53,10 +59,12 @@ It's not possible to read (`/get`) or write (`/set`) this value.
 The minimal value is `0` and the maximum value is `100`.
 The unit of this value is `%`.
 
-### Child lock (lock)
-The current state of this lock is in the published state under the `child_lock` property (value is `LOCK` or `UNLOCK`).
-To control this lock publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/set` with payload `{"child_lock": "LOCK"}` or `{"child_lock": "UNLOCK"}`.
+### Child lock (binary)
+Enables/disables physical input on the device.
+Value can be found in the published state on the `child_lock` property.
 It's not possible to read (`/get`) this value.
+To write (`/set`) a value publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/set` with payload `{"child_lock": NEW_VALUE}`.
+If value equals `LOCK` child lock is ON, if `UNLOCK` OFF.
 
 ### Eco mode (binary)
 ECO mode (energy saving mode).
@@ -148,11 +156,4 @@ It's not possible to read (`/get`) this value.
 To write (`/set`) a value publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/set` with payload `{"boost_heating_countdown_time_set": NEW_VALUE}`.
 The minimal value is `0` and the maximum value is `900`.
 The unit of this value is `s`.
-
-### Linkquality (numeric)
-Link quality (signal strength).
-Value can be found in the published state on the `linkquality` property.
-It's not possible to read (`/get`) or write (`/set`) this value.
-The minimal value is `0` and the maximum value is `255`.
-The unit of this value is `lqi`.
 

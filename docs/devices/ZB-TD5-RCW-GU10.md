@@ -18,13 +18,25 @@ pageClass: device-page
 | Model | ZB-TD5-RCW-GU10  |
 | Vendor  | [Moes](/supported-devices/#v=Moes)  |
 | Description | RGB+CCT 4.7W GU10 LED bulb |
-| Exposes | light (state, brightness, color_temp, color_xy), effect, do_not_disturb, color_power_on_behavior, linkquality |
+| Exposes | light (state, brightness, color_temp, color_xy), effect, do_not_disturb, color_power_on_behavior |
 | Picture | ![Moes ZB-TD5-RCW-GU10](https://www.zigbee2mqtt.io/images/devices/ZB-TD5-RCW-GU10.png) |
 
 
+
 <!-- Notes BEGIN: You can edit here. Add "## Notes" headline if not already present. -->
+## Notes
 
+### Pairing
+Power cycle three times: on-off, on-off, on-off, ON >> [up to 5 seconds] >>> starts flashing.
+A gap of 3+ seconds between off and on should be applied so the power drains out.
 
+### Issues
+
+The pairing sequence is triggered too easily, for example by noisy power (internal or external). As a result, **the device may occasionally "reset" on its own**, or with a single power-on cycle.  
+
+The device keeps the network key until it's overwritten with a new one. So even if it was "reset", the device behaves like it never left the network. However, Zigbee2MQTT and the routers would have removed it from their tables.
+
+An [external extension](https://github.com/Koenkk/zigbee2mqtt-user-extensions/tree/main/stable/ignore_device_leave) can be used to keep it in the Zigbee2MQTT database. But ideally, the misbehaving devices should be avoided, in order to keep a healthy and secure network.
 <!-- Notes END: Do not edit below this line -->
 
 
@@ -44,9 +56,13 @@ pageClass: device-page
 ### Light 
 This light supports the following features: `state`, `brightness`, `color_temp`, `color_xy`.
 - `state`: To control the state publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/set` with payload `{"state": "ON"}`, `{"state": "OFF"}` or `{"state": "TOGGLE"}`. To read the state send a message to `zigbee2mqtt/FRIENDLY_NAME/get` with payload `{"state": ""}`.
+                
 - `brightness`: To control the brightness publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/set` with payload `{"brightness": VALUE}` where `VALUE` is a number between `0` and `254`. To read the brightness send a message to `zigbee2mqtt/FRIENDLY_NAME/get` with payload `{"brightness": ""}`.
+                
 - `color_temp`: To control the color temperature (in reciprocal megakelvin a.k.a. mired scale) publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/set` with payload `{"color_temp": VALUE}` where `VALUE` is a number between `153` and `500`, the higher the warmer the color. To read the color temperature send a message to `zigbee2mqtt/FRIENDLY_NAME/get` with payload `{"color_temp": ""}`. Besides the numeric values the following values are accepted: `coolest`, `cool`, `neutral`, `warm`, `warmest`.
+                
 - `color_xy`: To control the XY color (CIE 1931 color space) publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/set` with payload `{"color": {"x": X_VALUE, "y": Y_VALUE}}` (e.g. `{"color":{"x":0.123,"y":0.123}}`). To read the XY color send a message to `zigbee2mqtt/FRIENDLY_NAME/get` with payload `{"color":{"x":"","y":""}}`. Alternatively it is possible to set the XY color via RGB:
+                
   - `{"color": {"r": R, "g": G, "b": B}}` e.g. `{"color":{"r":46,"g":102,"b":150}}`
   - `{"color": {"rgb": "R,G,B"}}` e.g. `{"color":{"rgb":"46,102,150"}}`
   - `{"color": {"hex": HEX}}` e.g. `{"color":{"hex":"#547CFF"}}`
@@ -70,13 +86,20 @@ The direction of move and step can be either up or down, provide a negative valu
 To do this send a payload like below to `zigbee2mqtt/FRIENDLY_NAME/set`
 
 **NOTE**: brightness move/step will stop at the minimum brightness and won't turn on the light when it's off. In this case use `brightness_move_onoff`/`brightness_step_onoff`
-````js
+```js
 {
   "brightness_move": -40, // Starts moving brightness down at 40 units per second
   "brightness_move": 0, // Stop moving brightness
   "brightness_step": 40 // Increases brightness by 40
   "color_temp_move": 60, // Starts moving color temperature up at 60 units per second
+  "color_temp_move": -40, // Starts moving color temperature down at 40 units per second
   "color_temp_move": "stop", // Stop moving color temperature
+  "color_temp_move": "release", // Stop moving color temperature
+  "color_temp_move": 0, // Stop moving color temperature
+  "color_temp_move": "up", // Move to warmer color temperature at default rate
+  "color_temp_move": 1, // Move to warmer color temperature at default rate
+  "color_temp_move": "down", // Move to cooler color temperature at default rate
+  "color_temp_move": {"rate": 30, "minimum": 150, "maximum": 500}, // Move with custom rate and constraints
   "color_temp_step": 99, // Increase color temperature by 99
 }
 ````
@@ -89,7 +112,7 @@ To write (`/set`) a value publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/
 The possible values are: `blink`, `breathe`, `okay`, `channel_change`, `finish_effect`, `stop_effect`, `colorloop`, `stop_colorloop`.
 
 ### Do not disturb (binary)
-Do not disturb mode, when enabled this function will keep the light OFF after a power outage.
+Controls state after power outage: false = on, true = restore previous state.
 Value can be found in the published state on the `do_not_disturb` property.
 It's not possible to read (`/get`) this value.
 To write (`/set`) a value publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/set` with payload `{"do_not_disturb": NEW_VALUE}`.
@@ -101,11 +124,4 @@ Value can be found in the published state on the `color_power_on_behavior` prope
 It's not possible to read (`/get`) this value.
 To write (`/set`) a value publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/set` with payload `{"color_power_on_behavior": NEW_VALUE}`.
 The possible values are: `initial`, `previous`, `customized`.
-
-### Linkquality (numeric)
-Link quality (signal strength).
-Value can be found in the published state on the `linkquality` property.
-It's not possible to read (`/get`) or write (`/set`) this value.
-The minimal value is `0` and the maximum value is `255`.
-The unit of this value is `lqi`.
 

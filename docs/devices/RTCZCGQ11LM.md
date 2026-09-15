@@ -18,8 +18,9 @@ pageClass: device-page
 | Model | RTCZCGQ11LM  |
 | Vendor  | [Aqara](/supported-devices/#v=Aqara)  |
 | Description | Presence sensor FP1 |
-| Exposes | presence, device_temperature, power_outage_count, presence_event, monitoring_mode, approach_distance, motion_sensitivity, reset_nopresence_status, region_upsert, region_delete, action, linkquality |
+| Exposes | presence, device_temperature, power_outage_count, presence_event, monitoring_mode, approach_distance, motion_sensitivity, reset_nopresence_status, configured_regions, region_upsert, region_delete, action |
 | Picture | ![Aqara RTCZCGQ11LM](https://www.zigbee2mqtt.io/images/devices/RTCZCGQ11LM.png) |
+
 
 
 <!-- Notes BEGIN: You can edit here. Add "## Notes" headline if not already present. -->
@@ -40,6 +41,8 @@ In order for this device to work, at least the following firmware is required on
 ### Pairing
 Press and hold the reset button on the device for +- 5 seconds (until the blue light starts blinking).
 After this the device will automatically join. If this doesn't work, try with a single short button press.
+
+Sometimes the device gets stuck. You have to pay attention to the LED when the device boots - it needs to flash once, then shortly after flash twice. If you only see the single flash, it's stuck and needs a special reset. One method is to keep pressing the button for 12 seconds after plugging it into a power source, till you see the double flash - it often takes a few tries to get it right. Directly after it's unstuck, put it into pairing-mode.
 
 ![RTCZCGQ11LM pairing](../images/pairing/RTCZCGQ11LM_pairing.jpg)
 
@@ -140,6 +143,11 @@ It's not possible to read (`/get`) this value.
 To write (`/set`) a value publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/set` with payload `{"reset_nopresence_status": NEW_VALUE}`.
 The possible values are: ``.
 
+### Configured regions (text)
+Region definitions written through Zigbee2MQTT. This is a Zigbee2MQTT-side cache and may not include regions configured by another gateway..
+Value can be found in the published state on the `configured_regions` property.
+It's not possible to read (`/get`) or write (`/set`) this value.
+
 ### Region upsert (composite)
 Definition of a new region to be added (or replace existing one). Creating or modifying a region requires you to define which zones of a 7x4 detection grid should be active for that zone. Regions can overlap, meaning that a zone can be defined in more than one region (eg. "zone x = 1 & y = 1" can be added to region 1 & 2). "Zone x = 1 & y = 1" is the nearest zone on the right (from sensor's perspective, along the detection path)..
 Can be set by publishing to `zigbee2mqtt/FRIENDLY_NAME/set` with payload `{"region_upsert": {"region_id": VALUE, "zones": VALUE}}`
@@ -156,11 +164,4 @@ Triggered action (e.g. a button click).
 Value can be found in the published state on the `action` property.
 It's not possible to read (`/get`) or write (`/set`) this value.
 The possible values are: `region_*_enter`, `region_*_leave`, `region_*_occupied`, `region_*_unoccupied`.
-
-### Linkquality (numeric)
-Link quality (signal strength).
-Value can be found in the published state on the `linkquality` property.
-It's not possible to read (`/get`) or write (`/set`) this value.
-The minimal value is `0` and the maximum value is `255`.
-The unit of this value is `lqi`.
 

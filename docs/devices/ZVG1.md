@@ -18,8 +18,9 @@ pageClass: device-page
 | Model | ZVG1  |
 | Vendor  | [RTX](/supported-devices/#v=RTX)  |
 | Description | Zigbee smart water valve |
-| Exposes | switch (state), battery, weather_delay, timer_state, timer, timer_time_left, last_valve_open_duration, water_consumed, cycle_timer_1, cycle_timer_2, cycle_timer_3, cycle_timer_4, normal_schedule_timer_1, normal_schedule_timer_2, normal_schedule_timer_3, normal_schedule_timer_4, linkquality |
+| Exposes | switch (state), battery, weather_delay, timer_state, timer, timer_time_left, last_valve_open_duration, water_consumed, cycle_timer_1, cycle_timer_2, cycle_timer_3, cycle_timer_4, normal_schedule_timer_1, normal_schedule_timer_2, normal_schedule_timer_3, normal_schedule_timer_4 |
 | Picture | ![RTX ZVG1](https://www.zigbee2mqtt.io/images/devices/ZVG1.png) |
+
 
 
 <!-- Notes BEGIN: You can edit here. Add "## Notes" headline if not already present. -->
@@ -31,6 +32,11 @@ After this the device will automatically join.
 <!-- Notes END: Do not edit below this line -->
 
 
+
+## Options
+*[How to use device type specific configuration](../guide/configuration/devices-groups.md#specific-device-options)*
+
+* `time_start`: Reply to Tuya-specific time synchronization requests: "1970" - Reply with seconds since 1970/01/01 (recommended, should stop the device from asking), "2000" - Reply with seconds since 2000/01/01 (use if the weekday is wrong with 1970), "off" - Don't reply (use if replying causes too much traffic). Default for this device: "2000". The value must be one of `1970`, `2000`, `off`
 
 
 ## Exposes
@@ -131,11 +137,4 @@ Format 08:00 / 15 / MoTuWeThFrSaSu / 1 (08:00 = start time 15 = duration in minu
 Value can be found in the published state on the `normal_schedule_timer_4` property.
 It's not possible to read (`/get`) this value.
 To write (`/set`) a value publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/set` with payload `{"normal_schedule_timer_4": NEW_VALUE}`.
-
-### Linkquality (numeric)
-Link quality (signal strength).
-Value can be found in the published state on the `linkquality` property.
-It's not possible to read (`/get`) or write (`/set`) this value.
-The minimal value is `0` and the maximum value is `255`.
-The unit of this value is `lqi`.
 

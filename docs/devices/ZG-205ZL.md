@@ -18,8 +18,9 @@ pageClass: device-page
 | Model | ZG-205ZL  |
 | Vendor  | [Tuya](/supported-devices/#v=Tuya)  |
 | Description | 24Ghz/5.8GHz human presence sensor |
-| Exposes | presence, motion_state, illuminance_lux, fading_time, large_motion_detection_distance, large_motion_detection_sensitivity, small_motion_detection_distance, small_motion_detection_sensitivity, static_detection_distance, static_detection_sensitivity, mode, alarm_volume, alarm_time, light_mode, linkquality |
+| Exposes | presence, motion_state, illuminance, fading_time, large_motion_detection_distance, large_motion_detection_sensitivity, small_motion_detection_distance, small_motion_detection_sensitivity, static_detection_distance, static_detection_sensitivity, mode, alarm_volume, alarm_time, light_mode |
 | Picture | ![Tuya ZG-205ZL](https://www.zigbee2mqtt.io/images/devices/ZG-205ZL.png) |
+
 
 
 <!-- Notes BEGIN: You can edit here. Add "## Notes" headline if not already present. -->
@@ -36,7 +37,9 @@ pairing process is in progress.
 ## Options
 *[How to use device type specific configuration](../guide/configuration/devices-groups.md#specific-device-options)*
 
-* `illuminance_lux_calibration`: Calibrates the illuminance_lux value (percentual offset), takes into effect on next report of device. The value must be a number.
+* `time_start`: Reply to Tuya-specific time synchronization requests: "1970" - Reply with seconds since 1970/01/01 (recommended, should stop the device from asking), "2000" - Reply with seconds since 2000/01/01 (use if the weekday is wrong with 1970), "off" - Don't reply (use if replying causes too much traffic). Default for this device: "off". The value must be one of `1970`, `2000`, `off`
+
+* `illuminance_calibration`: Calibrates the illuminance value (percentual offset), takes into effect on next report of device. The value must be a number.
 
 
 ## Exposes
@@ -53,9 +56,9 @@ Value can be found in the published state on the `motion_state` property.
 It's not possible to read (`/get`) or write (`/set`) this value.
 The possible values are: `none`, `large`, `small`, `static`.
 
-### Illuminance (lux) (numeric)
-Measured illuminance in lux.
-Value can be found in the published state on the `illuminance_lux` property.
+### Illuminance (numeric)
+Measured illuminance.
+Value can be found in the published state on the `illuminance` property.
 It's not possible to read (`/get`) or write (`/set`) this value.
 The unit of this value is `lx`.
 
@@ -81,7 +84,6 @@ Value can be found in the published state on the `large_motion_detection_sensiti
 It's not possible to read (`/get`) this value.
 To write (`/set`) a value publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/set` with payload `{"large_motion_detection_sensitivity": NEW_VALUE}`.
 The minimal value is `0` and the maximum value is `10`.
-The unit of this value is `x`.
 
 ### Small motion detection distance (numeric)
 Small motion detection distance.
@@ -97,7 +99,6 @@ Value can be found in the published state on the `small_motion_detection_sensiti
 It's not possible to read (`/get`) this value.
 To write (`/set`) a value publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/set` with payload `{"small_motion_detection_sensitivity": NEW_VALUE}`.
 The minimal value is `0` and the maximum value is `10`.
-The unit of this value is `x`.
 
 ### Static detection distance (numeric)
 Static detection distance.
@@ -113,7 +114,6 @@ Value can be found in the published state on the `static_detection_sensitivity` 
 It's not possible to read (`/get`) this value.
 To write (`/set`) a value publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/set` with payload `{"static_detection_sensitivity": NEW_VALUE}`.
 The minimal value is `0` and the maximum value is `10`.
-The unit of this value is `x`.
 
 ### Mode (enum)
 Working mode.
@@ -143,11 +143,4 @@ Value can be found in the published state on the `light_mode` property.
 It's not possible to read (`/get`) this value.
 To write (`/set`) a value publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/set` with payload `{"light_mode": NEW_VALUE}`.
 If value equals `ON` light mode is ON, if `OFF` OFF.
-
-### Linkquality (numeric)
-Link quality (signal strength).
-Value can be found in the published state on the `linkquality` property.
-It's not possible to read (`/get`) or write (`/set`) this value.
-The minimal value is `0` and the maximum value is `255`.
-The unit of this value is `lqi`.
 

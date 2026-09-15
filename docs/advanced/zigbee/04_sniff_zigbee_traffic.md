@@ -1,4 +1,5 @@
 ---
+redirectFrom: /how_tos/how_to_sniff_zigbee_traffic.md
 ---
 
 # Sniff Zigbee traffic
@@ -29,17 +30,15 @@ Use Adapter for loopback traffic capture. Then set the Zigbee protocol filter: `
 
 Wireshark will start and log the Zigbee messages once the sniffer is started. As these messages are encrypted we need to add 2 encryption keys. The first one is the Trust Center link key, which is the same for (almost) every Zigbee network. The second one is the network encryption key (Transport Key).
 
-::: tip TIP
-If using Wireshark on a different machine (different IP address), depending on your setup, you may get a lot of `ICMP: Destination unreachable (Port unreachable)` during the capture. You can use the filter `udp.port==17754 && !icmp` to get rid of them.
-:::
+> [!TIP]
+> If using Wireshark on a different machine (different IP address), depending on your setup, you may get a lot of `ICMP: Destination unreachable (Port unreachable)` during the capture. You can use the filter `udp.port==17754 && !icmp` to get rid of them.
 
-::: tip TIP
-You can find details on various customizations for Wireshark in the ZSmart Systems sniffer [PDF - page 7](https://www.opensmarthouse.org/files/download/ZigBeeWiresharkSniffer.pdf). **Coloring rules are processed in order until a match is found. You may need to re-order `UDP` to the bottom to get the Zigbee rules to apply properly.**
-:::
+> [!TIP]
+> You can find details on various customizations for Wireshark in the ZSmart Systems sniffer [PDF - page 7](https://www.opensmarthouse.org/files/download/ZigBeeWiresharkSniffer.pdf). **Coloring rules are processed in order until a match is found. You may need to re-order `UDP` to the bottom to get the Zigbee rules to apply properly.**
 
 ### Adding the Trust Center link key
 
-Add the Trust Center link key by going to to `Edit > Preferences > Protocols > ZigBee`.
+Add the Trust Center link key by going to to `Edit > Preferences > Protocols > Zigbee`.
 
 Set `Security Level` to `AES-128 Encryption, 32-bit Integrity Protection`.
 
@@ -64,11 +63,11 @@ If you changed your `network_key` (used `GENERATE`), you need to convert it to t
     You can paste your `network_key` below to convert it. Note: The conversion is done locally; your key never leaves your browser.
     <NetworkKeyConverter/>
 
-3. If you don't want to translate the numbers, the network encryption key is also exposed when a device joins the network. Pair a new device to the network (or re-pair an existing one) and grab the message where the Info is _Device Announcement...._. Open the message and expand _ZigBee Network Layer Data_ -> _ZigBee Security Header_.
+3. If you don't want to translate the numbers, the network encryption key is also exposed when a device joins the network. Pair a new device to the network (or re-pair an existing one) and grab the message where the Info is _Device Announcement...._. Open the message and expand _Zigbee Network Layer Data_ -> _Zigbee Security Header_.
 
     ![Wireshark network key](../../images/wireshark_network_key.png)
 
-Copy the key value, as shown above and go to `Edit > Preferences > Protocols > ZigBee > Pre-configured keys > Edit` and add the key with Byte Order `Normal`.
+Copy the key value, as shown above and go to `Edit > Preferences > Protocols > Zigbee > Pre-configured keys > Edit` and add the key with Byte Order `Normal`.
 
 Now Wireshark is able to decrypt the messages. When e.g. turning on a light you will see a message similar to:
 
@@ -78,10 +77,10 @@ Now Wireshark is able to decrypt the messages. When e.g. turning on a light you 
 
 ### Prerequisites
 
--   Computer
-    -   Ubuntu / Debian machine (tested with Ubuntu 18.04 / 18.10 and Debian 10)
-    -   Windows machine (tested with Windows 10)
--   CC2531 adapter
+- Computer
+    - Ubuntu / Debian machine (tested with Ubuntu 18.04 / 18.10 and Debian 10)
+    - Windows machine (tested with Windows 10)
+- CC2531 adapter
 
 ### 1. Flashing the CC2531 adapter
 
@@ -130,15 +129,14 @@ Start wireshark
 sudo whsniff -c ZIGBEE_CHANNEL_NUMBER | wireshark -k -i -
 ```
 
-::: tip TIP
-Depending on your distribution and installed packages, this may result in a broken pipe after some time. You will notice that Wireshark has stopped capturing, and attempting to resume by clicking the shark fin icon will present you with an error `end of file on pipe magic during open`, if this happens you may instead need to start with:
-
-```bash
-wireshark -k -i <( path/to/whsniff -c channel_number )
-```
-
-Alternative uses are detailed on the [whsniff project page](https://github.com/homewsn/whsniff#how-to-use-locally).
-:::
+> [!TIP]
+> Depending on your distribution and installed packages, this may result in a broken pipe after some time. You will notice that Wireshark has stopped capturing, and attempting to resume by clicking the shark fin icon will present you with an error `end of file on pipe magic during open`, if this happens you may instead need to start with:
+>
+> ```bash
+> wireshark -k -i <( path/to/whsniff -c channel_number )
+> ```
+>
+> Alternative uses are detailed on the [whsniff project page](https://github.com/homewsn/whsniff#how-to-use-locally).
 
 If you just want to save the sniffed data for later analysis you can run this command (compression with gzip is optional):
 
@@ -152,8 +150,8 @@ Run the ZBOSS executable in `gui\zboss_sniffer.exe`, enter the path to your Wire
 
 #### Troubleshooting
 
--   If you get `couldn't run /usr/bin/dumpcap in child process: permission denied` when running whsniff, check if /usr/bin/dumpcap is executable for everyone. Or `chmod 755 /usr/bin/dumpcap`.
--   You may need to remove `modemmanager` as this has been known to cause issues. [Howto](../../guide/faq/README.md#modemmanager-is-installed)
+- If you get `couldn't run /usr/bin/dumpcap in child process: permission denied` when running whsniff, check if /usr/bin/dumpcap is executable for everyone. Or `chmod 755 /usr/bin/dumpcap`.
+- You may need to remove `modemmanager` as this has been known to cause issues. [Howto](../../guide/faq/README.md#modemmanager-is-installed)
 
 ## With EmberZNet and HUSBZB-1 adapters
 
@@ -167,23 +165,23 @@ The adapter should work out of the box and require no extra step.
 
 Install drivers (whichever works for your adapter):
 
--   [Silicon Labs CP210x Universal Windows Driver](https://www.silabs.com/developers/usb-to-uart-bridge-vcp-drivers?tab=downloads)
-    -   Extract drivers to a folder
-    -   Inside that folder, right-click on `silabser.inf` then `Show more options` and choose `Install`
--   [WCH CH343SER](https://www.wch-ic.com/downloads/CH343SER_EXE.html)
-    -   Execute and follow setup steps to install.
+- [Silicon Labs CP210x Universal Windows Driver](https://www.silabs.com/developers/usb-to-uart-bridge-vcp-drivers?tab=downloads)
+    - Extract drivers to a folder
+    - Inside that folder, right-click on `silabser.inf` then `Show more options` and choose `Install`
+- [WCH CH343SER](https://www.wch-ic.com/downloads/CH343SER_EXE.html)
+    - Execute and follow setup steps to install.
 
 ### Using Ember ZLI
 
 #### Prerequisites
 
--   Computer
-    -   Linux machine (tested with Debian 12 64-bit)
-    -   Windows machine (tested with Windows 11)
-    -   MacOS machine
--   EmberZNet or HUSBZB-1 adapter
--   Wireshark
--   NodeJS / npm (if using npm-based installation method)
+- Computer
+    - Linux machine (tested with Debian 12 64-bit)
+    - Windows machine (tested with Windows 11)
+    - MacOS machine
+- EmberZNet or HUSBZB-1 adapter
+- Wireshark (optional, can write directly to a [PCAP file](https://github.com/Nerivec/ember-zli/wiki/Sniff#sending-to-pcap-file) instead)
+- NodeJS / npm (if using npm-based installation method)
 
 #### 1. Installing required tools
 
@@ -197,12 +195,12 @@ Install drivers (whichever works for your adapter):
 
 #### Prerequisites
 
--   Computer
-    -   Linux machine (tested with Ubuntu 18.10)
-    -   Windows machine (tested with Windows 10)
--   EmberZNet or HUSBZB-1 adapter
--   Wireshark
--   Java
+- Computer
+    - Linux machine (tested with Ubuntu 18.10)
+    - Windows machine (tested with Windows 10)
+- EmberZNet or HUSBZB-1 adapter
+- Wireshark
+- Java
 
 #### 1. Installing required tools
 
@@ -210,15 +208,14 @@ Both Windows and Linux use the same program for sniffing. You can fetch a precom
 
 You can also find a PDF documentation from ZSmart Systems [here](https://www.opensmarthouse.org/files/download/ZigBeeWiresharkSniffer.pdf).
 
-::: tip TIP
-Linux: Some EmberZNet adapters use the exact same USB identifiers as a brltty udev-registered device, so if your EmberZNet USB dongle is not recognized, just disable the rule of brltty for idVendor=1a86, idProduct=7523 (same as the CH340 serial converter used in the EmberZNet adapter). Edit /`usr/lib/udev/rules.d/85-brltty.rules` and comment `# ENV{PRODUCT}=="1a86/7523/*", ENV{BRLTTY_BRAILLE_DRIVER}="bm", GOTO="brltty_usb_run"`. Unplug and replug the EmberZNet adapter.
-:::
+> [!TIP]
+> Linux: Some EmberZNet adapters use the exact same USB identifiers as a brltty udev-registered device, so if your EmberZNet USB dongle is not recognized, just disable the rule of brltty for idVendor=1a86, idProduct=7523 (same as the CH340 serial converter used in the EmberZNet adapter). Edit /`usr/lib/udev/rules.d/85-brltty.rules` and comment `# ENV{PRODUCT}=="1a86/7523/*", ENV{BRLTTY_BRAILLE_DRIVER}="bm", GOTO="brltty_usb_run"`. Unplug and replug the EmberZNet adapter.
 
 #### 2. Sniffing traffic
 
 In a terminal or command line, run `java -jar ZigbeeSniffer.jar -baud 115200 -flow {OPTION} -port {PORT} -c {CHANNEL}`.
 
-Depending on your adapter, `OPTION` should be replaced by `none` (Sonoff Dongle-E, SLZB-06m...) or `hardware` (HUSBZB-1, SkyConnect...).
+Depending on your adapter, `OPTION` should be replaced by `none` (Sonoff Dongle-E, SLZB-06m...) or `hardware` (HUSBZB-1, ZBT-1...).
 
 ##### Windows
 
@@ -227,3 +224,19 @@ Open the Device Manager (Win+X, M) and find which COM port your adapter is using
 ##### Linux
 
 `PORT` will be something like `/dev/ttyUSB0` or wherever you plugged in your HUSBZB-1 device.
+
+## With nRF52 adapter
+
+### Prerequisites
+
+- Ubuntu Linux / macOS 10.14+ / Windows 10+
+- [nRF52 dongle](https://www.digikey.com/en/products/detail/nordic-semiconductor-asa/NRF52840-DONGLE/9491124) or [development kit](https://www.digikey.com/en/products/detail/nordic-semiconductor-asa/nrf52840-dk/8593726)
+- Wireshark v3.0+
+
+### 1. Programming dongle, installing required tools
+
+[Installing nRF Sniffer for 802.15.4](https://docs.nordicsemi.com/bundle/ug_sniffer_802154/page/UG/sniffer_802154/installing_sniffer_802154.html)
+
+### 2. Sniffing traffic
+
+[Capturing data with the nRF Sniffer](https://docs.nordicsemi.com/bundle/ug_sniffer_802154/page/UG/sniffer_802154/capturing_data_sniffer_802154.html)

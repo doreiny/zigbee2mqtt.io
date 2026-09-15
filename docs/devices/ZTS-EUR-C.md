@@ -18,8 +18,9 @@ pageClass: device-page
 | Model | ZTS-EUR-C  |
 | Vendor  | [Moes](/supported-devices/#v=Moes)  |
 | Description | Zigbee + RF curtain switch |
-| Exposes | cover (state, position), backlight, calibration, motor_reversal, linkquality |
+| Exposes | cover (state, position), backlight, calibration, motor_reversal |
 | Picture | ![Moes ZTS-EUR-C](https://www.zigbee2mqtt.io/images/devices/ZTS-EUR-C.png) |
+
 
 
 <!-- Notes BEGIN: You can edit here. Add "## Notes" headline if not already present. -->
@@ -40,7 +41,9 @@ Calibration procedure:
 ## Options
 *[How to use device type specific configuration](../guide/configuration/devices-groups.md#specific-device-options)*
 
-* `invert_cover`: Inverts the cover position, false: open=100,close=0, true: open=0,close=100 (default false). The value must be `true` or `false`
+* `time_start`: Reply to Tuya-specific time synchronization requests: "1970" - Reply with seconds since 1970/01/01 (recommended, should stop the device from asking), "2000" - Reply with seconds since 2000/01/01 (use if the weekday is wrong with 1970), "off" - Don't reply (use if replying causes too much traffic). Default for this device: "off". The value must be one of `1970`, `2000`, `off`
+
+* `invert_cover`: Inverts the cover position and state, false: open=100,close=0, true: open=0,close=100 (default false). The value must be `true` or `false`
 
 
 ## Exposes
@@ -68,11 +71,4 @@ Value can be found in the published state on the `motor_reversal` property.
 It's not possible to read (`/get`) this value.
 To write (`/set`) a value publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/set` with payload `{"motor_reversal": NEW_VALUE}`.
 The possible values are: `OFF`, `ON`.
-
-### Linkquality (numeric)
-Link quality (signal strength).
-Value can be found in the published state on the `linkquality` property.
-It's not possible to read (`/get`) or write (`/set`) this value.
-The minimal value is `0` and the maximum value is `255`.
-The unit of this value is `lqi`.
 

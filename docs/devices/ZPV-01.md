@@ -18,8 +18,9 @@ pageClass: device-page
 | Model | ZPV-01  |
 | Vendor  | [Novato](/supported-devices/#v=Novato)  |
 | Description | Battery powered smart valve |
-| Exposes | switch (state), valve_state, linkquality |
+| Exposes | switch (state), valve_state, battery |
 | Picture | ![Novato ZPV-01](https://www.zigbee2mqtt.io/images/devices/ZPV-01.png) |
+
 
 
 <!-- Notes BEGIN: You can edit here. Add "## Notes" headline if not already present. -->
@@ -28,6 +29,11 @@ pageClass: device-page
 <!-- Notes END: Do not edit below this line -->
 
 
+
+## Options
+*[How to use device type specific configuration](../guide/configuration/devices-groups.md#specific-device-options)*
+
+* `time_start`: Reply to Tuya-specific time synchronization requests: "1970" - Reply with seconds since 1970/01/01 (recommended, should stop the device from asking), "2000" - Reply with seconds since 2000/01/01 (use if the weekday is wrong with 1970), "off" - Don't reply (use if replying causes too much traffic). Default for this device: "off". The value must be one of `1970`, `2000`, `off`
 
 
 ## Exposes
@@ -38,15 +44,15 @@ To control this switch publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/set
 It's not possible to read (`/get`) this value.
 
 ### Valve state (enum)
-State of the valve.
+Valve Status.
 Value can be found in the published state on the `valve_state` property.
 It's not possible to read (`/get`) or write (`/set`) this value.
-The possible values are: `close`, `unknown`, `open`.
+The possible values are: `Closed`, `Unknown`, `Open`.
 
-### Linkquality (numeric)
-Link quality (signal strength).
-Value can be found in the published state on the `linkquality` property.
+### Battery (numeric)
+Remaining battery in %, can take up to 24 hours before reported.
+Value can be found in the published state on the `battery` property.
 It's not possible to read (`/get`) or write (`/set`) this value.
-The minimal value is `0` and the maximum value is `255`.
-The unit of this value is `lqi`.
+The minimal value is `0` and the maximum value is `100`.
+The unit of this value is `%`.
 

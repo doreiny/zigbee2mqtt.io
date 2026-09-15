@@ -18,8 +18,9 @@ pageClass: device-page
 | Model | MSM-300ZB  |
 | Vendor  | [ShinaSystem](/supported-devices/#v=ShinaSystem)  |
 | Description | SiHAS remote control 4 button |
-| Exposes | action, battery, voltage, linkquality |
+| Exposes | action, battery, voltage |
 | Picture | ![ShinaSystem MSM-300ZB](https://www.zigbee2mqtt.io/images/devices/MSM-300ZB.png) |
+
 
 
 <!-- Notes BEGIN: You can edit here. Add "## Notes" headline if not already present. -->
@@ -27,6 +28,9 @@ pageClass: device-page
 
 <!-- Notes END: Do not edit below this line -->
 
+
+## OTA updates
+This device supports OTA updates, for more information see [OTA updates](../guide/usage/ota_updates.md).
 
 
 
@@ -50,11 +54,4 @@ Voltage of the battery in millivolts.
 Value can be found in the published state on the `voltage` property.
 It's not possible to read (`/get`) or write (`/set`) this value.
 The unit of this value is `mV`.
-
-### Linkquality (numeric)
-Link quality (signal strength).
-Value can be found in the published state on the `linkquality` property.
-It's not possible to read (`/get`) or write (`/set`) this value.
-The minimal value is `0` and the maximum value is `255`.
-The unit of this value is `lqi`.
 

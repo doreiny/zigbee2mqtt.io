@@ -18,9 +18,10 @@ pageClass: device-page
 | Model | TS0601_switch_4_gang_1  |
 | Vendor  | [Tuya](/supported-devices/#v=Tuya)  |
 | Description | 4 gang switch |
-| Exposes | switch (state), linkquality |
+| Exposes | switch (state) |
 | Picture | ![Tuya TS0601_switch_4_gang_1](https://www.zigbee2mqtt.io/images/devices/TS0601_switch_4_gang_1.png) |
 | White-label | Norklmes MKS-CM-W5, Somgoms ZSQB-SMB-ZB, Moes WS-EUB1-ZG, AVATTO ZGB-WS-EU |
+
 
 
 <!-- Notes BEGIN: You can edit here. Add "## Notes" headline if not already present. -->
@@ -29,6 +30,11 @@ pageClass: device-page
 <!-- Notes END: Do not edit below this line -->
 
 
+
+## Options
+*[How to use device type specific configuration](../guide/configuration/devices-groups.md#specific-device-options)*
+
+* `time_start`: Reply to Tuya-specific time synchronization requests: "1970" - Reply with seconds since 1970/01/01 (recommended, should stop the device from asking), "2000" - Reply with seconds since 2000/01/01 (use if the weekday is wrong with 1970), "off" - Don't reply (use if replying causes too much traffic). Default for this device: "off". The value must be one of `1970`, `2000`, `off`
 
 
 ## Exposes
@@ -52,11 +58,4 @@ It's not possible to read (`/get`) this value.
 The current state of this switch is in the published state under the `state_l4` property (value is `ON` or `OFF`).
 To control this switch publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/set` with payload `{"state_l4": "ON"}`, `{"state_l4": "OFF"}` or `{"state_l4": "TOGGLE"}`.
 It's not possible to read (`/get`) this value.
-
-### Linkquality (numeric)
-Link quality (signal strength).
-Value can be found in the published state on the `linkquality` property.
-It's not possible to read (`/get`) or write (`/set`) this value.
-The minimal value is `0` and the maximum value is `255`.
-The unit of this value is `lqi`.
 

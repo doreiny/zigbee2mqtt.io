@@ -18,8 +18,9 @@ pageClass: device-page
 | Model | ATMS1601Z  |
 | Vendor  | [Tuya](/supported-devices/#v=Tuya)  |
 | Description | Din smart relay (without power monitoring) |
-| Exposes | switch (state), power_outage_memory, indicator_mode, linkquality |
+| Exposes | switch (state), power_outage_memory, indicator_mode |
 | Picture | ![Tuya ATMS1601Z](https://www.zigbee2mqtt.io/images/devices/ATMS1601Z.png) |
+
 
 
 <!-- Notes BEGIN: You can edit here. Add "## Notes" headline if not already present. -->
@@ -31,6 +32,8 @@ pageClass: device-page
 
 ## Options
 *[How to use device type specific configuration](../guide/configuration/devices-groups.md#specific-device-options)*
+
+* `time_start`: Reply to Tuya-specific time synchronization requests: "1970" - Reply with seconds since 1970/01/01 (recommended, should stop the device from asking), "2000" - Reply with seconds since 2000/01/01 (use if the weekday is wrong with 1970), "off" - Don't reply (use if replying causes too much traffic). Default for this device: "off". The value must be one of `1970`, `2000`, `off`
 
 * `state_action`: State actions will also be published as 'action' when true (default false). The value must be `true` or `false`
 
@@ -61,11 +64,4 @@ Value can be found in the published state on the `indicator_mode` property.
 It's not possible to read (`/get`) this value.
 To write (`/set`) a value publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/set` with payload `{"indicator_mode": NEW_VALUE}`.
 The possible values are: `off`, `on_off`, `off_on`.
-
-### Linkquality (numeric)
-Link quality (signal strength).
-Value can be found in the published state on the `linkquality` property.
-It's not possible to read (`/get`) or write (`/set`) this value.
-The minimal value is `0` and the maximum value is `255`.
-The unit of this value is `lqi`.
 

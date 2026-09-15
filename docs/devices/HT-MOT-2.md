@@ -18,8 +18,9 @@ pageClass: device-page
 | Model | HT-MOT-2  |
 | Vendor  | [Heimgard Technologies](/supported-devices/#v=Heimgard%20Technologies)  |
 | Description | Motion sensor |
-| Exposes | battery, tamper, occupancy, linkquality |
+| Exposes | battery, tamper, occupancy |
 | Picture | ![Heimgard Technologies HT-MOT-2](https://www.zigbee2mqtt.io/images/devices/HT-MOT-2.png) |
+
 
 
 <!-- Notes BEGIN: You can edit here. Add "## Notes" headline if not already present. -->
@@ -32,7 +33,7 @@ pageClass: device-page
 ## Options
 *[How to use device type specific configuration](../guide/configuration/devices-groups.md#specific-device-options)*
 
-* `identify_timeout`: Sets duration of identification procedure in seconds (i.e., how long device would flash). Value ranges from 1 to 30 seconds (default 3). The value must be a number with a minimum value of `1` and with a with a maximum value of `30`
+* `identify_timeout`: Sets duration of identification procedure in seconds (i.e., how long device would flash). Value ranges from 1 to 30 seconds (default 3). The value must be a number with a minimum value of `1` and with a maximum value of `30`
 
 
 ## Exposes
@@ -55,11 +56,4 @@ Indicates whether the device detected occupancy.
 Value can be found in the published state on the `occupancy` property.
 It's not possible to read (`/get`) or write (`/set`) this value.
 If value equals `true` occupancy is ON, if `false` OFF.
-
-### Linkquality (numeric)
-Link quality (signal strength).
-Value can be found in the published state on the `linkquality` property.
-It's not possible to read (`/get`) or write (`/set`) this value.
-The minimal value is `0` and the maximum value is `255`.
-The unit of this value is `lqi`.
 

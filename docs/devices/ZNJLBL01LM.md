@@ -18,9 +18,10 @@ pageClass: device-page
 | Model | ZNJLBL01LM  |
 | Vendor  | [Aqara](/supported-devices/#v=Aqara)  |
 | Description | Roller shade driver E1 |
-| Exposes | cover (state, position), battery, device_temperature, charging_status, motor_state, running, motor_speed, linkquality |
+| Exposes | cover (state, position), battery, device_temperature, charging_status, reverse_direction, motor_state, running, motor_speed |
 | Picture | ![Aqara ZNJLBL01LM](https://www.zigbee2mqtt.io/images/devices/ZNJLBL01LM.png) |
 | White-label | Aqara RSD-M01 |
+
 
 
 <!-- Notes BEGIN: You can edit here. Add "## Notes" headline if not already present. -->
@@ -29,7 +30,7 @@ pageClass: device-page
 ### Pairing
 Hold the reset button, on the bottom of the device, for 5 seconds.
 
-_Pairing the device with a new bridge will **not** reset the fully open/closed position._
+*Pairing the device with a new bridge will **not** reset the fully open/closed position.*
 
 ### Fully open and fully closed positions
 The rotation range (fully open and fully closed) can be reset by holding the both the up and down buttons for 3 seconds until the light turns blue.
@@ -41,7 +42,7 @@ The fully open position can be set by setting the shade to the desired position 
 The fully closed position can be set by setting the shade to the desired position and then pressing the down button 5 times in succession. If successful the light turns blue and flashes 3 times.
 
 ### Change button directions
-If the up and down buttons are working in the oppsite direction of how your blinds opreate, they can be swapped by pressing the reset button 3 times. If successful the light turns solid blue for 1 second.
+If the up and down buttons are working in the opposite direction of how your blinds operate, they can be swapped by pressing the reset button 3 times. If successful the light turns solid blue for 1 second.
 
 ### Adapter firmware
 In order for this device to work (fully), at least the following firmware is required on your adapter:
@@ -63,7 +64,7 @@ This device supports OTA updates, for more information see [OTA updates](../guid
 
 * `device_temperature_calibration`: Calibrates the device_temperature value (absolute offset), takes into effect on next report of device. The value must be a number.
 
-* `invert_cover`: Inverts the cover position, false: open=100,close=0, true: open=0,close=100 (default false). The value must be `true` or `false`
+* `invert_cover`: Inverts the cover position and state, false: open=100,close=0, true: open=0,close=100 (default false). The value must be `true` or `false`
 
 
 ## Exposes
@@ -95,6 +96,13 @@ To read (`/get`) the value publish a message to topic `zigbee2mqtt/FRIENDLY_NAME
 It's not possible to write (`/set`) this value.
 If value equals `true` charging status is ON, if `false` OFF.
 
+### Reverse direction (binary)
+Whether the curtain direction is inverted.
+Value can be found in the published state on the `reverse_direction` property.
+To read (`/get`) the value publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/get` with payload `{"reverse_direction": ""}`.
+To write (`/set`) a value publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/set` with payload `{"reverse_direction": NEW_VALUE}`.
+If value equals `true` reverse direction is ON, if `false` OFF.
+
 ### Motor state (enum)
 The current state of the motor..
 Value can be found in the published state on the `motor_state` property.
@@ -113,11 +121,4 @@ Value can be found in the published state on the `motor_speed` property.
 To read (`/get`) the value publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/get` with payload `{"motor_speed": ""}`.
 To write (`/set`) a value publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/set` with payload `{"motor_speed": NEW_VALUE}`.
 The possible values are: `low`, `medium`, `high`.
-
-### Linkquality (numeric)
-Link quality (signal strength).
-Value can be found in the published state on the `linkquality` property.
-It's not possible to read (`/get`) or write (`/set`) this value.
-The minimal value is `0` and the maximum value is `255`.
-The unit of this value is `lqi`.
 

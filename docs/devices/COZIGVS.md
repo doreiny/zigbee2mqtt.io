@@ -18,8 +18,9 @@ pageClass: device-page
 | Model | COZIGVS  |
 | Vendor  | [Conecto](/supported-devices/#v=Conecto)  |
 | Description | Vibration sensor |
-| Exposes | vibration, sensitivity, buzzer_mute, linkquality |
+| Exposes | vibration, sensitivity, buzzer_mute |
 | Picture | ![Conecto COZIGVS](https://www.zigbee2mqtt.io/images/devices/COZIGVS.png) |
+
 
 
 <!-- Notes BEGIN: You can edit here. Add "## Notes" headline if not already present. -->
@@ -28,6 +29,11 @@ pageClass: device-page
 <!-- Notes END: Do not edit below this line -->
 
 
+
+## Options
+*[How to use device type specific configuration](../guide/configuration/devices-groups.md#specific-device-options)*
+
+* `time_start`: Reply to Tuya-specific time synchronization requests: "1970" - Reply with seconds since 1970/01/01 (recommended, should stop the device from asking), "2000" - Reply with seconds since 2000/01/01 (use if the weekday is wrong with 1970), "off" - Don't reply (use if replying causes too much traffic). Default for this device: "off". The value must be one of `1970`, `2000`, `off`
 
 
 ## Exposes
@@ -41,19 +47,11 @@ If value equals `true` vibration is ON, if `false` OFF.
 ### Sensitivity (numeric)
 Sensitivity of the sensor (single press the button when muted to switch between low (one beep), medium (two beeps) and max (three beeps)).
 Value can be found in the published state on the `sensitivity` property.
-It's not possible to read (`/get`) this value.
-To write (`/set`) a value publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/set` with payload `{"sensitivity": NEW_VALUE}`.
+It's not possible to read (`/get`) or write (`/set`) this value.
 The minimal value is `0` and the maximum value is `2`.
 
 ### Buzzer mute (text)
 ON when buzzer is muted (double press the button on device to toggle).
 Value can be found in the published state on the `buzzer_mute` property.
 It's not possible to read (`/get`) or write (`/set`) this value.
-
-### Linkquality (numeric)
-Link quality (signal strength).
-Value can be found in the published state on the `linkquality` property.
-It's not possible to read (`/get`) or write (`/set`) this value.
-The minimal value is `0` and the maximum value is `255`.
-The unit of this value is `lqi`.
 

@@ -1,7 +1,7 @@
 ---
 title: "Nous A1Z control via MQTT"
 description: "Integrate your Nous A1Z via Zigbee2MQTT with whatever smart home infrastructure you are using without the vendor's bridge or gateway."
-addedAt: 2024-08-01T18:23:53
+addedAt: 2024-10-31T20:36:52
 pageClass: device-page
 ---
 
@@ -18,26 +18,40 @@ pageClass: device-page
 | Model | A1Z  |
 | Vendor  | [Nous](/supported-devices/#v=Nous)  |
 | Description | Smart plug (with power monitoring) |
-| Exposes | switch (state), countdown, power_outage_memory, indicator_mode, power, current, voltage, energy, lock (state), linkquality |
+| Exposes | switch (state), countdown, power_outage_memory, switch_type_button, indicator_mode, power, current, voltage, energy, child_lock, identify |
 | Picture | ![Nous A1Z](https://www.zigbee2mqtt.io/images/devices/A1Z.png) |
+
 
 
 <!-- Notes BEGIN: You can edit here. Add "## Notes" headline if not already present. -->
 ## Notes
 
 ### Pairing
+
 If the indicator light does not flash rapidly, press the button for 5 to 7 seconds to reset the smart plug parameters to factory settings.
 
+### Reset
 
-### Reset energy
-To reset `Sum of consumed energy`, use the Dev console and execute:
+There are two ways to reset the device data. Both will reset to factory settings, which means any changed state (led state, restore state, etc.) will be reset to the default value.
+
+Once done, next time the plug gets polled, the following states and data will be reset:
+
+- `Power Outage Memory`
+- `Sum of consumed energy`
+- `Indicator Mode`
+
+#### Dev console
+
+To reset, use the Dev console and execute:
 `Endpoint`: `1`
-`Cluster`: `0x00`
-`Command`: `0`
+`Cluster`: `0x00` (`genBasic`)
+`Command`: `0` (`resetFactDefault`)
 `Payload`: (don't change this)
 
-Next time the plug gets polled, `Sum of consumed energy` will start from zero again.
 
+#### JSON payload
+
+The same effect can be achieved by sending the following json payload to the device : `json::{"reset":""}`
 <!-- Notes END: Do not edit below this line -->
 
 
@@ -48,21 +62,25 @@ This device supports OTA updates, for more information see [OTA updates](../guid
 ## Options
 *[How to use device type specific configuration](../guide/configuration/devices-groups.md#specific-device-options)*
 
+* `time_start`: Reply to Tuya-specific time synchronization requests: "1970" - Reply with seconds since 1970/01/01 (recommended, should stop the device from asking), "2000" - Reply with seconds since 2000/01/01 (use if the weekday is wrong with 1970), "off" - Don't reply (use if replying causes too much traffic). Default for this device: "off". The value must be one of `1970`, `2000`, `off`
+
 * `power_calibration`: Calibrates the power value (percentual offset), takes into effect on next report of device. The value must be a number.
 
-* `power_precision`: Number of digits after decimal point for power, takes into effect on next report of device. This option can only decrease the precision, not increase it. The value must be a number with a minimum value of `0` and with a with a maximum value of `3`
+* `power_precision`: Number of digits after decimal point for power, takes into effect on next report of device. This option can only decrease the precision, not increase it. The value must be a number with a minimum value of `0` and with a maximum value of `3`
 
 * `current_calibration`: Calibrates the current value (percentual offset), takes into effect on next report of device. The value must be a number.
 
-* `current_precision`: Number of digits after decimal point for current, takes into effect on next report of device. This option can only decrease the precision, not increase it. The value must be a number with a minimum value of `0` and with a with a maximum value of `3`
+* `current_precision`: Number of digits after decimal point for current, takes into effect on next report of device. This option can only decrease the precision, not increase it. The value must be a number with a minimum value of `0` and with a maximum value of `3`
 
 * `voltage_calibration`: Calibrates the voltage value (percentual offset), takes into effect on next report of device. The value must be a number.
 
-* `voltage_precision`: Number of digits after decimal point for voltage, takes into effect on next report of device. This option can only decrease the precision, not increase it. The value must be a number with a minimum value of `0` and with a with a maximum value of `3`
+* `voltage_precision`: Number of digits after decimal point for voltage, takes into effect on next report of device. This option can only decrease the precision, not increase it. The value must be a number with a minimum value of `0` and with a maximum value of `3`
 
 * `energy_calibration`: Calibrates the energy value (percentual offset), takes into effect on next report of device. The value must be a number.
 
-* `energy_precision`: Number of digits after decimal point for energy, takes into effect on next report of device. This option can only decrease the precision, not increase it. The value must be a number with a minimum value of `0` and with a with a maximum value of `3`
+* `energy_precision`: Number of digits after decimal point for energy, takes into effect on next report of device. This option can only decrease the precision, not increase it. The value must be a number with a minimum value of `0` and with a maximum value of `3`
+
+* `identify_timeout`: Sets the duration of the identification procedure in seconds (i.e., how long the device would flash).The value ranges from 1 to 30 seconds (default: 3). The value must be a number with a minimum value of `1` and with a maximum value of `30`
 
 * `state_action`: State actions will also be published as 'action' when true (default false). The value must be `true` or `false`
 
@@ -75,9 +93,9 @@ To control this switch publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/set
 To read the current state of this switch publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/get` with payload `{"state": ""}`.
 
 ### Countdown (numeric)
-Countdown to turn device off after a certain time.
+Toggle the device after a set duration (one time action).
 Value can be found in the published state on the `countdown` property.
-To read (`/get`) the value publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/get` with payload `{"countdown": ""}`.
+It's not possible to read (`/get`) this value.
 To write (`/set`) a value publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/set` with payload `{"countdown": NEW_VALUE}`.
 The minimal value is `0` and the maximum value is `43200`.
 The unit of this value is `s`.
@@ -88,6 +106,13 @@ Value can be found in the published state on the `power_outage_memory` property.
 To read (`/get`) the value publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/get` with payload `{"power_outage_memory": ""}`.
 To write (`/set`) a value publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/set` with payload `{"power_outage_memory": NEW_VALUE}`.
 The possible values are: `on`, `off`, `restore`.
+
+### Switch type button (enum)
+Determines when the button actuates.
+Value can be found in the published state on the `switch_type_button` property.
+To read (`/get`) the value publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/get` with payload `{"switch_type_button": ""}`.
+To write (`/set`) a value publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/set` with payload `{"switch_type_button": NEW_VALUE}`.
+The possible values are: `release`, `press`.
 
 ### Indicator mode (enum)
 LED indicator mode.
@@ -120,15 +145,17 @@ Value can be found in the published state on the `energy` property.
 It's not possible to read (`/get`) or write (`/set`) this value.
 The unit of this value is `kWh`.
 
-### Child lock (lock)
-The current state of this lock is in the published state under the `child_lock` property (value is `LOCK` or `UNLOCK`).
-To control this lock publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/set` with payload `{"child_lock": "LOCK"}` or `{"child_lock": "UNLOCK"}`.
+### Child lock (binary)
+Enables/disables physical input on the device.
+Value can be found in the published state on the `child_lock` property.
 It's not possible to read (`/get`) this value.
+To write (`/set`) a value publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/set` with payload `{"child_lock": NEW_VALUE}`.
+If value equals `LOCK` child lock is ON, if `UNLOCK` OFF.
 
-### Linkquality (numeric)
-Link quality (signal strength).
-Value can be found in the published state on the `linkquality` property.
-It's not possible to read (`/get`) or write (`/set`) this value.
-The minimal value is `0` and the maximum value is `255`.
-The unit of this value is `lqi`.
+### Identify (enum)
+Initiate device identification.
+Value will **not** be published in the state.
+It's not possible to read (`/get`) this value.
+To write (`/set`) a value publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/set` with payload `{"identify": NEW_VALUE}`.
+The possible values are: `identify`.
 
